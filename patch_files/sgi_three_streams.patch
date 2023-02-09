@@ -1,0 +1,624 @@
+diff -ruN backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.c SGI_three_streams/net/mac80211/rc80211_minstrel_ht.c
+--- backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.c	2022-07-04 19:12:04.807821660 +0300
++++ SGI_three_streams/net/mac80211/rc80211_minstrel_ht.c	2022-07-04 19:11:10.916897585 +0300
+@@ -15,6 +15,10 @@
+ #include "rc80211_minstrel.h"
+ #include "rc80211_minstrel_ht.h"
+ 
++
++#define CUSTOM_DEBUG
++
++
+ #define AVG_AMPDU_SIZE	16
+ #define AVG_PKT_SIZE	1200
+ 
+@@ -233,7 +237,14 @@
+ static u8 sample_table[SAMPLE_COLUMNS][MCS_GROUP_RATES] __read_mostly;
+ 
+ static void
+-minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi);
++minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi, int rix1, int rix2, int rix3, int try1, int try2, int try3);
++
++// Custom Functions
++void short_term_stats_reset(struct minstrel_ht_sta *mi);
++void reset_stats(struct minstrel_priv *mp, struct minstrel_ht_sta *mi);
++void recovery(struct minstrel_priv *mp, struct minstrel_ht_sta *mi);
++static void minstrel_ht_set_rate(struct minstrel_priv *mp, struct minstrel_ht_sta *mi,
++		                     struct ieee80211_sta_rates *ratetbl, int offset, int index, int retries);
+ 
+ /*
+  * Some VHT MCSes are invalid (when Ndbps / Nes is not an integer)
+@@ -299,7 +310,6 @@
+ 		      struct ieee80211_tx_rate *rate)
+ {
+ 	int group, idx;
+-
+ 	if (rate->flags & IEEE80211_TX_RC_MCS) {
+ 		group = minstrel_ht_get_group_idx(rate);
+ 		idx = rate->idx % 8;
+@@ -676,6 +686,7 @@
+ 	}
+ }
+ 
++/*
+ static void
+ minstrel_downgrade_rate(struct minstrel_ht_sta *mi, u16 *idx, bool primary)
+ {
+@@ -699,6 +710,7 @@
+ 		break;
+ 	}
+ }
++*/
+ 
+ static void
+ minstrel_aggr_check(struct ieee80211_sta *pubsta, struct sk_buff *skb)
+@@ -723,6 +735,98 @@
+ 	ieee80211_start_tx_ba_session(pubsta, tid, 0);
+ }
+ 
++
++// Function corresponds to update_rate() function mentioned in the paper
++void reset_stats(struct minstrel_priv *mp, struct minstrel_ht_sta *mi){
++	int old_group;
++        int new_group;
++	int old_mcs_index;
++	int new_mcs_index;
++	
++	// Reset consecutive successes and failures
++	short_term_stats_reset(mi);
++	
++	// Return to not lose changes due to minstrel_ht_update_stats()
++	if(mi->recovery){
++		return;
++	}
++
++	// Find old rate to detect if rate increase	
++	old_group 	= mi->max_tp_rate[0] / MCS_GROUP_RATES;
++	old_mcs_index	= mi->max_tp_rate[0] % MCS_GROUP_RATES;
++	
++	// tx_rate	
++	minstrel_ht_update_stats(mp, mi);
++
++	// Find new rate to detect if rate increase	
++	new_group 	= mi->max_tp_rate[0] / MCS_GROUP_RATES;
++	new_mcs_index 	= mi->max_tp_rate[0] % MCS_GROUP_RATES;
++
++	if(new_group < old_group){
++		return;
++	}
++	else if(new_group > old_group){
++		mi->probe_interval = 20; //ms
++	}
++	else {
++		if(new_mcs_index > old_mcs_index){
++			mi->probe_interval = 20; //ms
++		}
++	}
++}
++
++
++
++// Function corresponds to rate_statistics() function mentioned in the paper
++void short_term_rate_stats(struct minstrel_priv *mp, struct minstrel_ht_sta *mi){
++	mi->recovery = false;
++
++	// At least one failed attempt was detected
++	if(mi->consecutive_retries >= 2){
++		mi->consecutive_successes = 0;
++		mi->consecutive_failures = mi->consecutive_retries - 1;
++	}
++
++	// A single attempt was required to send data
++	else if(mi->consecutive_retries){
++		mi->consecutive_successes++;	
++		mi->consecutive_failures = 0;	
++	}
++
++	// Consecutive Successes: 10
++	if(mi->consecutive_successes >= 10){
++		mi->probe_interval = 90; 	//ms
++	}
++
++	// Consecutive Failures: 4
++	else if(mi->consecutive_failures >= 4){
++		mi->probe_interval = 10;	//ms
++	}
++
++	// Consecutive Failures: 2
++	else if(mi->consecutive_failures >= 2){
++
++#ifdef CUSTOM_DEBUG 
++		printk("Recovery State");
++#endif	
++		// Fallback to previous TX Rate
++		recovery(mp, mi);
++
++		// Reset consecutive successes and failures, update_rate() mentioned in paper
++		reset_stats(mp, mi);
++
++		mi->probe_interval = 30;	//ms
++
++		return; 
++	}
++
++	// This is not mentioned in the paper. Consecutive retries are
++	// reset in order to correctly compute successes without merging
++	// the iteration of statistics (the for loop above this function
++	// call) with this particular function.
++	mi->consecutive_retries = 0;
++}
++
+ static void
+ minstrel_ht_tx_status(void *priv, struct ieee80211_supported_band *sband,
+                       void *priv_sta, struct ieee80211_tx_status *st)
+@@ -731,10 +835,16 @@
+ 	struct minstrel_ht_sta_priv *msp = priv_sta;
+ 	struct minstrel_ht_sta *mi = &msp->ht;
+ 	struct ieee80211_tx_rate *ar = info->status.rates;
+-	struct minstrel_rate_stats *rate, *rate2;
++	struct minstrel_rate_stats *rate;
+ 	struct minstrel_priv *mp = priv;
+-	bool last, update = false;
++	bool last;
++	long long int current_time;
++	int rix1, rix2, rix3;
++	int try1, try2, try3;
+ 	int i;
++	int mcs_group;
++	int mcs_index;
++	int tx_rate;
+ 
+ 	if (!msp->is_ht)
+ 		return mac80211_minstrel.tx_status_ext(priv, sband,
+@@ -771,41 +881,221 @@
+ 		       !minstrel_ht_txstat_valid(mp, &ar[i + 1]);
+ 
+ 		rate = minstrel_ht_get_stats(mp, mi, &ar[i]);
+-
++		
+ 		if (last)
+ 			rate->success += info->status.ampdu_ack_len;
++			
++		// Increment consecutive_retries
++		mi->consecutive_retries = mi->consecutive_retries + ar[i].count; 
+ 
+ 		rate->attempts += ar[i].count * info->status.ampdu_len;
+ 	}
+ 
+-	/*
+-	 * check for sudden death of spatial multiplexing,
+-	 * downgrade to a lower number of streams if necessary.
+-	 */
+-	rate = minstrel_get_ratestats(mi, mi->max_tp_rate[0]);
+-	if (rate->attempts > 30 &&
+-	    MINSTREL_FRAC(rate->success, rate->attempts) <
+-	    MINSTREL_FRAC(20, 100)) {
+-		minstrel_downgrade_rate(mi, &mi->max_tp_rate[0], true);
+-		update = true;
+-	}
+-
+-	rate2 = minstrel_get_ratestats(mi, mi->max_tp_rate[1]);
+-	if (rate2->attempts > 30 &&
+-	    MINSTREL_FRAC(rate2->success, rate2->attempts) <
+-	    MINSTREL_FRAC(20, 100)) {
+-		minstrel_downgrade_rate(mi, &mi->max_tp_rate[1], false);
+-		update = true;
+-	}
+-
+-	if (time_after(jiffies, mi->last_stats_update +
+-				(mp->update_interval / 2 * HZ) / 1000)) {
+-		update = true;
+-		minstrel_ht_update_stats(mp, mi);
++	// Rate short term statistics (corresponds to rate_statistics() from the given paper)
++	short_term_rate_stats(mp, mi);
++	
++#ifdef CUSTOM_DEBUG
++	for(i = 0; i < MAX_THR_RATES; i++){
++		printk("max_tp_rates[%d]: %d\n", i, mi->max_tp_rate[i]);
++	}
++	printk("Sucesses (%d), Failures (%d), Retries(%d)", mi->consecutive_successes, mi->consecutive_failures, mi->consecutive_retries);
++#endif
++
++	// Reset consecutive successes and failures (correspond to update_rate())
++	// Reseting these stats only when failures are detected since the successes 
++	// are accumulated contrary to failires, which are computed once.
++	if(!mi->consecutive_successes){
++		reset_stats(mp, mi);
++	}
++
++	// Enter probe state
++	current_time = NANO_TO_MS(ktime_get());
++
++	// TX state and TX period just started 
++	if(mi->state && !mi->tx_period_start){
++		mi->tx_period_start = current_time;
++	}
++	
++	// TX state and TX period finished, thus move to Probe state	
++	if(mi->state && (current_time - mi->tx_period_start) > mi->probe_interval){
++		mi->state = false;			
++		
++		// Reset TX period
++		mi->tx_period_start = 0;
++	}
++	
++	// Probe state and Probe period just started
++	if(!mi->state && !mi->probe_period_start){
++		mi->probe_period_start = current_time;
++
++		// Probe period just started, thus first probe flag is valid
++		mi->first_probe = false;
++	}
++	
++	// Probe state and Probe period fininshed, thus move to TX state
++	if(!mi->state && (current_time - mi->probe_period_start) > mi->tx_interval){	
++		// Probe state and Probe period finished, thus move to TX state
++		mi->state = true;
++
++		// Reset Probe period
++		mi->probe_period_start = 0;	
++	}
++
++
++	rix1 = rix2 = rix3 = -1;
++
++	// *********************** TX State *********************** //
++	if(mi->state){
++
++#ifdef CUSTOM_DEBUG
++		printk("TX State\n");
++#endif
++	
++		rix1 = mi->max_tp_rate[0]; 	// tx_rate 
++		rix2 = mi->max_tp_rate[1]; 	// down_rate()
++		rix3 = mi->max_tp_rate[2]; 	// down_rate()
++	}	   
++	
++	// *********************** Probe State *********************** //
++	else if(!mi->state){
++
++#ifdef CUSTOM_DEBUG
++		printk("Probe State");
++#endif
++
++		// First Probe: Send at adjacent rates
++		if(!mi->first_probe){
++#ifdef CUSTOM_DEBUG
++			printk("First Probe Period");
++#endif
++			
++
++			// MCS 
++			mcs_index = mi->max_tp_rate[0] % MCS_GROUP_RATES;
++
++			if(mcs_index > 0 && mcs_index < 7){
++				rix1 = mi->max_tp_rate[0] + 1; 	// up_probe()
++				rix2 = mi->max_tp_rate[0];	// tx_rate
++				rix3 = mi->max_tp_rate[0] - 1; 	// down_probe()
++				try3 = 2;
++			}
++			else if(!mcs_index){
++				rix1 = mi->max_tp_rate[0] + 1;
++				rix2 = mi->max_tp_rate[0];
++				rix3 = mi->max_tp_rate[1];
++			}
++			else {
++				rix1 = mi->max_tp_rate[0];
++				rix2 = mi->max_tp_rate[0] - 1;
++				rix3 = mi->max_tp_rate[0] - 2;
++			}
++
++			mi->first_probe = true;
++			mi->probe_interval = 10; //ms
++		}
++		
++		// Second Probe: Send adjacent groups
++		else {
++
++#ifdef CUSTOM_DEBUG
++			printk("Second Probe Period");
++#endif
++
++			mi->first_probe = false;
++			mi->probe_interval = 60; //ms
++			
++			//Find the group we are, by taking max_tp_rates[0] value
++			mcs_group = mi->max_tp_rate[0] / MCS_GROUP_RATES;
++
++			//Find the mcs_index in our group
++			mcs_index = mi->max_tp_rate[0] % MCS_GROUP_RATES; 
++
++			// right_probe (+8) and right_down_probe (+7)
++			if ((mcs_group == 0) || ((mcs_group == 1 || mcs_group == 2 || mcs_group=4 || mcs_group == 5) && mi->probe_right)){
++				if(mcs_group != 2){
++					if (mcs_index > 0){
++						rix1 = mi->max_tp_rate[0] + MCS_GROUP_RATES; 		// right_probe()
++						rix2 = mi->max_tp_rate[0] + MCS_GROUP_RATES - 1; 	// right_down_probe()
++						rix3 = mi->max_tp_rate[0];				// tx_rate
++					}
++					else if (!mcs_index){
++						rix1 = mi->max_tp_rate[0] + MCS_GROUP_RATES; 
++						rix2 = mi->max_tp_rate[0] + MCS_GROUP_RATES - 3; 
++						rix3 = mi->max_tp_rate[0];
++					}
++				}
++				else if(mcs_group == 2) {
++					if(mcs_index > 0) {
++						rix1 = mi->max_tp_rate[0] + 2 * MCS_GROUP_RATES;
++						rix2 = mi->max_tp_rate[0] + (2 * MCS_GROUP_RATES) - 1;
++						rix3 = mi->max_tp_rate[0];
++					}
++					else if(!mcs_index){
++						rix1 = mi->max_tp_rate[0] + 2 * MCS_GROUP_RATES;
++						rix2 = mi->max_tp_rate[0] + (2 * MCS_GROUP_RATES) - 3;
++						rix3 = mi->max_tp_rate[0];
++					}	
++				}
++				
++				
++				if(mcs_group == 1 || mcs_group == 2 ||mcs_group ==4 || mcs_group == 5){	
++					mi->probe_right = false;
++				}
++			}
++
++			// left_probe (-8) and left_up_probe (-7)
++		       	else if ((mcs_group == 6) || ((mcs_group == 1 || mcs_group == 2 || mcs_group == 4 || mcs_group == 5) && !mi->probe_right)){
++				if(mcs_group != 4) {
++					if (mcs_index < 7){
++						rix1 = mi->max_tp_rate[0];
++						rix2 = mi->max_tp_rate[0] - (MCS_GROUP_RATES - 1); 	// left_up_probe()
++				        	rix3 = mi->max_tp_rate[0] - MCS_GROUP_RATES; 		// left_probe()
++					}
++					else if (mcs_index == 7){
++						rix1 = mi->max_tp_rate[0];
++						rix2 = mi->max_tp_rate[0] - (MCS_GROUP_RATES - 3);
++						rix3 = mi->max_tp_rate[0] - MCS_GROUP_RATES;
++					}
++				}
++				else if (mcs_group == 4){
++					if (mcs_index < 7) {
++						rix1 = mi->max_tp_rate[0];
++						rix2 = mi->max_tp_rate[0] - (2 * MCS_GROUP_RATES - 1);
++						rix3 = mi->max_tp_rate[0] - (2 * MCS_GROUP_RATES);
++					} else if (mcs_index == 7) {
++						rix1 = mi->max_tp_rate[0];
++						rix2 = mi->max_tp_rate[0] - (2 * MCS_GROUP_RATES - 3);
++						rix3 = mi->max_tp_rate[0] - 2 * MCS_GROUP_RATES;
++					} 
++				
++				}
++				
++				if(mcs_group == 1 || mcs_group == 2 || mcs_group == 4 || mcs_group == 5){
++					mi->probe_right = true;
++				}
++			}
++		}
+ 	}
+ 
+-	if (update)
+-		minstrel_ht_update_rates(mp, mi);
++	try1 = try2 = try3 = 2;
++
++
++#ifdef CUSTOM_DEBUG
++	printk("rix1: %d\n", rix1);
++	printk("rix2: %d\n", rix2);
++	printk("rix3: %d\n", rix3);
++#endif
++	
++	if(rix1 < 0 || rix2 < 0 || rix3 < 0){
++		return;
++	}
++	
++	minstrel_ht_update_rates(mp, mi, rix1, rix2, rix3, try1, try2, try3);
++	if(time_after(jiffies, mi->last_stats_update + (mp->update_interval / 2 * HZ) / 1000)){
++			minstrel_ht_update_stats(mp, mi);
++	}
++				
++
+ }
+ 
+ static inline int
+@@ -875,8 +1165,7 @@
+ 
+ static void
+ minstrel_ht_set_rate(struct minstrel_priv *mp, struct minstrel_ht_sta *mi,
+-                     struct ieee80211_sta_rates *ratetbl, int offset, int index)
+-{
++                    struct ieee80211_sta_rates *ratetbl, int offset, int index, int retries) {
+ 	const struct mcs_group *group = &minstrel_mcs_groups[index / MCS_GROUP_RATES];
+ 	struct minstrel_rate_stats *mrs;
+ 	u8 idx;
+@@ -886,14 +1175,21 @@
+ 	if (!mrs->retry_updated)
+ 		minstrel_calc_retransmit(mp, mi, index);
+ 
+-	if (mrs->prob_ewma < MINSTREL_FRAC(20, 100) || !mrs->retry_count) {
+-		ratetbl->rate[offset].count = 2;
+-		ratetbl->rate[offset].count_rts = 2;
+-		ratetbl->rate[offset].count_cts = 2;
+-	} else {
+-		ratetbl->rate[offset].count = mrs->retry_count;
+-		ratetbl->rate[offset].count_cts = mrs->retry_count;
+-		ratetbl->rate[offset].count_rts = mrs->retry_count_rtscts;
++	if (retries == -1) {
++		if (mrs->prob_ewma < MINSTREL_FRAC(20, 100) || !mrs->retry_count) {
++			ratetbl->rate[offset].count = 2;
++			ratetbl->rate[offset].count_rts = 2;
++			ratetbl->rate[offset].count_cts = 2;
++		} else {
++			ratetbl->rate[offset].count = mrs->retry_count;
++			ratetbl->rate[offset].count_cts = mrs->retry_count;
++			ratetbl->rate[offset].count_rts = mrs->retry_count_rtscts;
++		}
++	}
++	else {
++		ratetbl->rate[offset].count = retries;
++		ratetbl->rate[offset].count_cts = retries;
++		ratetbl->rate[offset].count_rts = retries;
+ 	}
+ 
+ 	if (index / MCS_GROUP_RATES == MINSTREL_CCK_GROUP)
+@@ -977,8 +1273,7 @@
+ }
+ 
+ static void
+-minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi)
+-{
++minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi, int rix1, int rix2, int rix3, int try1, int try2, int try3) {
+ 	struct ieee80211_sta_rates *rates;
+ 	int i = 0;
+ 
+@@ -987,15 +1282,15 @@
+ 		return;
+ 
+ 	/* Start with max_tp_rate[0] */
+-	minstrel_ht_set_rate(mp, mi, rates, i++, mi->max_tp_rate[0]);
++	minstrel_ht_set_rate(mp, mi, rates, i++, rix1, try1);
+ 
+ 	if (mp->hw->max_rates >= 3) {
+ 		/* At least 3 tx rates supported, use max_tp_rate[1] next */
+-		minstrel_ht_set_rate(mp, mi, rates, i++, mi->max_tp_rate[1]);
++		minstrel_ht_set_rate(mp, mi, rates, i++, rix2, try2);
+ 	}
+ 
+ 	if (mp->hw->max_rates >= 2) {
+-		minstrel_ht_set_rate(mp, mi, rates, i++, mi->max_prob_rate);
++		minstrel_ht_set_rate(mp, mi, rates, i++, rix3, try3);
+ 	}
+ 
+ 	mi->sta->max_rc_amsdu_len = minstrel_ht_get_max_amsdu_len(mi);
+@@ -1003,6 +1298,40 @@
+ 	rate_control_set_rates(mp->hw, mi->sta, rates);
+ }
+ 
++//Recovery
++void recovery(struct minstrel_priv *mp, struct minstrel_ht_sta *mi){
++	int i = 0;
++	int try1, try2, try3;
++
++	mi->recovery = true;
++	for(i = 0; i < MAX_THR_RATES - 1; i++) {
++		if(!(mi->max_tp_rate[i] % MCS_GROUP_RATES)){ 
++			if(!mi->max_tp_rate[i]){
++				mi->max_tp_rate[i] = 0;
++			}
++			else if(mi->max_tp_rate[i] == 40){
++				mi->max_tp_rate[i] = mi->max_tp_rate[i] - 2 * MCS_GROUP_RATES;
++			}
++			else {
++				mi->max_tp_rate[i] = mi->max_tp_rate[i] - MCS_GROUP_RATES;
++		
++			}
++		}	
++		else {
++			mi->max_tp_rate[i] = mi->max_tp_rate[i] - 1;
++		}
++	}
++
++	// Tries
++	try1 = 2;
++	try2 = 2;
++	try3 = 2;
++	
++	minstrel_ht_update_rates(mp, mi, mi->max_tp_rate[0], mi->max_tp_rate[1], mi->max_tp_rate[2], try1, try2, try3);
++}
++
++
++
+ static int
+ minstrel_get_sample_rate(struct minstrel_priv *mp, struct minstrel_ht_sta *mi)
+ {
+@@ -1175,6 +1504,23 @@
+ 	mi->supported[MINSTREL_CCK_GROUP] = mi->cck_supported;
+ }
+ 
++void short_term_stats_reset(struct minstrel_ht_sta *mi){
++	mi->consecutive_successes	= 0;
++	mi->consecutive_failures 	= 0;
++	mi->consecutive_retries 	= 0;
++}
++
++
++void long_term_stats_init(struct minstrel_ht_sta *mi){
++	mi->state = true;
++	mi->probe_right = true;
++	mi->probe_interval 	= 60;	//ms
++	mi->tx_interval 	= 20;	//ms 
++	mi->tx_period_start 	= 0;	//ms
++	mi->probe_period_start 	= 0; 	//ms
++}
++
++
+ static void
+ minstrel_ht_update_caps(void *priv, struct ieee80211_supported_band *sband,
+ 			struct cfg80211_chan_def *chandef,
+@@ -1192,7 +1538,7 @@
+ 	int stbc;
+ 	int i;
+ 	bool ldpc;
+-
++	
+ 	/* fall back to the old minstrel for legacy stations */
+ 	if (!sta->ht_cap.ht_supported)
+ 		goto use_legacy;
+@@ -1319,7 +1665,15 @@
+ 
+ 	/* create an initial rate table with the lowest supported rates */
+ 	minstrel_ht_update_stats(mp, mi);
+-	minstrel_ht_update_rates(mp, mi);
++
++	minstrel_ht_update_rates(mp, mi, mi->max_tp_rate[0], mi->max_tp_rate[1], mi->max_prob_rate, -1, -1, -1);
++ 	
++	
++	// Initialize short term statistics
++	short_term_stats_reset(mi);
++
++	// Initialize long term statistics
++	long_term_stats_init(mi);
+ 
+ 	return;
+ 
+diff -ruN backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.h SGI_three_streams/net/mac80211/rc80211_minstrel_ht.h
+--- backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.h	2022-07-04 19:12:08.159751990 +0300
++++ SGI_three_streams/net/mac80211/rc80211_minstrel_ht.h	2022-07-04 19:11:14.452827855 +0300
+@@ -29,6 +29,11 @@
+ 
+ #define MCS_GROUP_RATES		10
+ 
++# define NANO_TO_MS(timestamp) (timestamp/1000000)
++
++
++
++
+ struct mcs_group {
+ 	u16 flags;
+ 	u8 streams;
+@@ -73,6 +78,27 @@
+ 
+ 	unsigned int total_packets;
+ 	unsigned int sample_packets;
++	
++	//L3S general information
++	bool state; 	// True: TX State, False: Probe State
++	bool recovery; 	// True: Recovery was Called
++
++	//L3S short term related stats
++	unsigned int consecutive_successes;
++	unsigned int consecutive_failures;
++	unsigned int consecutive_retries;
++
++	//L3S long term related stats
++	bool first_probe;
++	bool probe_right;
++	unsigned int probe_interval;
++	unsigned int tx_interval;
++
++
++	unsigned int tx_period_start;
++	unsigned int probe_period_start;
++
++
+ 
+ 	/* tx flags to add for frames for this sta */
+ 	u32 tx_flags;

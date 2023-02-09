@@ -1,0 +1,1070 @@
+diff -ruN backports-5.3.6-1/backport-include/backport/autoconf.h two_streams/backport-include/backport/autoconf.h
+--- backports-5.3.6-1/backport-include/backport/autoconf.h	2022-07-04 18:49:38.270412158 +0300
++++ two_streams/backport-include/backport/autoconf.h	2022-07-04 18:21:42.625740615 +0300
+@@ -18,6 +18,7 @@
+ #define CPTCFG_CFG80211_REQUIRE_SIGNED_REGDB 1
+ #define CPTCFG_CFG80211_USE_KERNEL_REGDB_KEYS 1
+ #define CPTCFG_CFG80211_DEFAULT_PS 1
++#define CPTCFG_CFG80211_DEBUGFS 1
+ #define CPTCFG_CFG80211_CRDA_SUPPORT 1
+ #define CPTCFG_CFG80211_WEXT 1
+ #define CPTCFG_MAC80211_MODULE 1
+@@ -27,16 +28,23 @@
+ #define CPTCFG_MAC80211_RC_DEFAULT "minstrel_ht"
+ #define CPTCFG_MAC80211_MESH 1
+ #define CPTCFG_MAC80211_LEDS 1
++#define CPTCFG_MAC80211_DEBUGFS 1
++#define CPTCFG_MAC80211_MESSAGE_TRACING 1
+ #define CPTCFG_MAC80211_STA_HASH_MAX_SIZE 0
+ #define CPTCFG_WLAN 1
+ #define CPTCFG_WLAN_VENDOR_ADMTEK 1
+ #define CPTCFG_ATH_COMMON_MODULE 1
+ #define CPTCFG_WLAN_VENDOR_ATH 1
++#define CPTCFG_ATH_DEBUG 1
++#define CPTCFG_ATH_TRACEPOINTS 1
+ #define CPTCFG_ATH9K_HW_MODULE 1
+ #define CPTCFG_ATH9K_COMMON_MODULE 1
++#define CPTCFG_ATH9K_COMMON_DEBUG 1
+ #define CPTCFG_ATH9K_BTCOEX_SUPPORT 1
+ #define CPTCFG_ATH9K_MODULE 1
+ #define CPTCFG_ATH9K_PCI 1
++#define CPTCFG_ATH9K_DEBUGFS 1
++#define CPTCFG_ATH9K_STATION_STATISTICS 1
+ #define CPTCFG_ATH9K_RFKILL 1
+ #define CPTCFG_ATH9K_PCOEM 1
+ #define CPTCFG_ATH9K_HTC_MODULE 1
+@@ -71,6 +79,7 @@
+ #define CPTCFG_BACKPORTED_CFG80211_REQUIRE_SIGNED_REGDB 1
+ #define CPTCFG_BACKPORTED_CFG80211_USE_KERNEL_REGDB_KEYS 1
+ #define CPTCFG_BACKPORTED_CFG80211_DEFAULT_PS 1
++#define CPTCFG_BACKPORTED_CFG80211_DEBUGFS 1
+ #define CPTCFG_BACKPORTED_CFG80211_CRDA_SUPPORT 1
+ #define CPTCFG_BACKPORTED_CFG80211_WEXT 1
+ #define CPTCFG_BACKPORTED_MAC80211_MODULE 1
+@@ -79,15 +88,22 @@
+ #define CPTCFG_BACKPORTED_MAC80211_RC_DEFAULT_MINSTREL 1
+ #define CPTCFG_BACKPORTED_MAC80211_MESH 1
+ #define CPTCFG_BACKPORTED_MAC80211_LEDS 1
++#define CPTCFG_BACKPORTED_MAC80211_DEBUGFS 1
++#define CPTCFG_BACKPORTED_MAC80211_MESSAGE_TRACING 1
+ #define CPTCFG_BACKPORTED_WLAN 1
+ #define CPTCFG_BACKPORTED_WLAN_VENDOR_ADMTEK 1
+ #define CPTCFG_BACKPORTED_ATH_COMMON_MODULE 1
+ #define CPTCFG_BACKPORTED_WLAN_VENDOR_ATH 1
++#define CPTCFG_BACKPORTED_ATH_DEBUG 1
++#define CPTCFG_BACKPORTED_ATH_TRACEPOINTS 1
+ #define CPTCFG_BACKPORTED_ATH9K_HW_MODULE 1
+ #define CPTCFG_BACKPORTED_ATH9K_COMMON_MODULE 1
++#define CPTCFG_BACKPORTED_ATH9K_COMMON_DEBUG 1
+ #define CPTCFG_BACKPORTED_ATH9K_BTCOEX_SUPPORT 1
+ #define CPTCFG_BACKPORTED_ATH9K_MODULE 1
+ #define CPTCFG_BACKPORTED_ATH9K_PCI 1
++#define CPTCFG_BACKPORTED_ATH9K_DEBUGFS 1
++#define CPTCFG_BACKPORTED_ATH9K_STATION_STATISTICS 1
+ #define CPTCFG_BACKPORTED_ATH9K_RFKILL 1
+ #define CPTCFG_BACKPORTED_ATH9K_PCOEM 1
+ #define CPTCFG_BACKPORTED_ATH9K_HTC_MODULE 1
+diff -ruN backports-5.3.6-1/.config two_streams/.config
+--- backports-5.3.6-1/.config	2022-07-04 18:49:38.262412316 +0300
++++ two_streams/.config	2022-07-04 18:21:27.289882068 +0300
+@@ -19,7 +19,7 @@
+ CPTCFG_CFG80211_REQUIRE_SIGNED_REGDB=y
+ CPTCFG_CFG80211_USE_KERNEL_REGDB_KEYS=y
+ CPTCFG_CFG80211_DEFAULT_PS=y
+-# CPTCFG_CFG80211_DEBUGFS is not set
++CPTCFG_CFG80211_DEBUGFS=y
+ CPTCFG_CFG80211_CRDA_SUPPORT=y
+ CPTCFG_CFG80211_WEXT=y
+ CPTCFG_MAC80211=m
+@@ -29,8 +29,8 @@
+ CPTCFG_MAC80211_RC_DEFAULT="minstrel_ht"
+ CPTCFG_MAC80211_MESH=y
+ CPTCFG_MAC80211_LEDS=y
+-# CPTCFG_MAC80211_DEBUGFS is not set
+-# CPTCFG_MAC80211_MESSAGE_TRACING is not set
++CPTCFG_MAC80211_DEBUGFS=y
++CPTCFG_MAC80211_MESSAGE_TRACING=y
+ # CPTCFG_MAC80211_DEBUG_MENU is not set
+ CPTCFG_MAC80211_STA_HASH_MAX_SIZE=0
+ CPTCFG_WLAN=y
+@@ -39,16 +39,19 @@
+ # CPTCFG_ADM8211 is not set
+ CPTCFG_ATH_COMMON=m
+ CPTCFG_WLAN_VENDOR_ATH=y
+-# CPTCFG_ATH_DEBUG is not set
++CPTCFG_ATH_DEBUG=y
++CPTCFG_ATH_TRACEPOINTS=y
+ # CPTCFG_ATH5K is not set
+ # CPTCFG_ATH5K_PCI is not set
+ CPTCFG_ATH9K_HW=m
+ CPTCFG_ATH9K_COMMON=m
++CPTCFG_ATH9K_COMMON_DEBUG=y
+ CPTCFG_ATH9K_BTCOEX_SUPPORT=y
+ CPTCFG_ATH9K=m
+ CPTCFG_ATH9K_PCI=y
+ # CPTCFG_ATH9K_AHB is not set
+-# CPTCFG_ATH9K_DEBUGFS is not set
++CPTCFG_ATH9K_DEBUGFS=y
++CPTCFG_ATH9K_STATION_STATISTICS=y
+ # CPTCFG_ATH9K_DYNACK is not set
+ # CPTCFG_ATH9K_WOW is not set
+ CPTCFG_ATH9K_RFKILL=y
+@@ -57,6 +60,7 @@
+ CPTCFG_ATH9K_HTC=m
+ # CPTCFG_ATH9K_HTC_DEBUGFS is not set
+ # CPTCFG_ATH9K_HWRNG is not set
++# CPTCFG_ATH9K_COMMON_SPECTRAL is not set
+ # CPTCFG_CARL9170 is not set
+ # CPTCFG_ATH6KL is not set
+ # CPTCFG_AR5523 is not set
+@@ -7705,6 +7709,7 @@
+ CPTCFG_BACKPORTED_CFG80211_REQUIRE_SIGNED_REGDB=y
+ CPTCFG_BACKPORTED_CFG80211_USE_KERNEL_REGDB_KEYS=y
+ CPTCFG_BACKPORTED_CFG80211_DEFAULT_PS=y
++CPTCFG_BACKPORTED_CFG80211_DEBUGFS=y
+ CPTCFG_BACKPORTED_CFG80211_CRDA_SUPPORT=y
+ CPTCFG_BACKPORTED_CFG80211_WEXT=y
+ CPTCFG_BACKPORTED_MAC80211=m
+@@ -7713,15 +7718,22 @@
+ CPTCFG_BACKPORTED_MAC80211_RC_DEFAULT_MINSTREL=y
+ CPTCFG_BACKPORTED_MAC80211_MESH=y
+ CPTCFG_BACKPORTED_MAC80211_LEDS=y
++CPTCFG_BACKPORTED_MAC80211_DEBUGFS=y
++CPTCFG_BACKPORTED_MAC80211_MESSAGE_TRACING=y
+ CPTCFG_BACKPORTED_WLAN=y
+ CPTCFG_BACKPORTED_WLAN_VENDOR_ADMTEK=y
+ CPTCFG_BACKPORTED_ATH_COMMON=m
+ CPTCFG_BACKPORTED_WLAN_VENDOR_ATH=y
++CPTCFG_BACKPORTED_ATH_DEBUG=y
++CPTCFG_BACKPORTED_ATH_TRACEPOINTS=y
+ CPTCFG_BACKPORTED_ATH9K_HW=m
+ CPTCFG_BACKPORTED_ATH9K_COMMON=m
++CPTCFG_BACKPORTED_ATH9K_COMMON_DEBUG=y
+ CPTCFG_BACKPORTED_ATH9K_BTCOEX_SUPPORT=y
+ CPTCFG_BACKPORTED_ATH9K=m
+ CPTCFG_BACKPORTED_ATH9K_PCI=y
++CPTCFG_BACKPORTED_ATH9K_DEBUGFS=y
++CPTCFG_BACKPORTED_ATH9K_STATION_STATISTICS=y
+ CPTCFG_BACKPORTED_ATH9K_RFKILL=y
+ CPTCFG_BACKPORTED_ATH9K_PCOEM=y
+ CPTCFG_BACKPORTED_ATH9K_HTC=m
+diff -ruN backports-5.3.6-1/.config.old two_streams/.config.old
+--- backports-5.3.6-1/.config.old	2022-07-04 18:49:36.434448408 +0300
++++ two_streams/.config.old	2022-07-04 18:21:22.729924129 +0300
+@@ -19,7 +19,7 @@
+ CPTCFG_CFG80211_REQUIRE_SIGNED_REGDB=y
+ CPTCFG_CFG80211_USE_KERNEL_REGDB_KEYS=y
+ CPTCFG_CFG80211_DEFAULT_PS=y
+-# CPTCFG_CFG80211_DEBUGFS is not set
++CPTCFG_CFG80211_DEBUGFS=y
+ CPTCFG_CFG80211_CRDA_SUPPORT=y
+ CPTCFG_CFG80211_WEXT=y
+ CPTCFG_MAC80211=m
+@@ -29,8 +29,8 @@
+ CPTCFG_MAC80211_RC_DEFAULT="minstrel_ht"
+ CPTCFG_MAC80211_MESH=y
+ CPTCFG_MAC80211_LEDS=y
+-# CPTCFG_MAC80211_DEBUGFS is not set
+-# CPTCFG_MAC80211_MESSAGE_TRACING is not set
++CPTCFG_MAC80211_DEBUGFS=y
++CPTCFG_MAC80211_MESSAGE_TRACING=y
+ # CPTCFG_MAC80211_DEBUG_MENU is not set
+ CPTCFG_MAC80211_STA_HASH_MAX_SIZE=0
+ CPTCFG_WLAN=y
+@@ -39,16 +39,19 @@
+ # CPTCFG_ADM8211 is not set
+ CPTCFG_ATH_COMMON=m
+ CPTCFG_WLAN_VENDOR_ATH=y
+-# CPTCFG_ATH_DEBUG is not set
++CPTCFG_ATH_DEBUG=y
++CPTCFG_ATH_TRACEPOINTS=y
+ # CPTCFG_ATH5K is not set
+ # CPTCFG_ATH5K_PCI is not set
+ CPTCFG_ATH9K_HW=m
+ CPTCFG_ATH9K_COMMON=m
++CPTCFG_ATH9K_COMMON_DEBUG=y
+ CPTCFG_ATH9K_BTCOEX_SUPPORT=y
+ CPTCFG_ATH9K=m
+ CPTCFG_ATH9K_PCI=y
+ # CPTCFG_ATH9K_AHB is not set
+-# CPTCFG_ATH9K_DEBUGFS is not set
++CPTCFG_ATH9K_DEBUGFS=y
++CPTCFG_ATH9K_STATION_STATISTICS=y
+ # CPTCFG_ATH9K_DYNACK is not set
+ # CPTCFG_ATH9K_WOW is not set
+ CPTCFG_ATH9K_RFKILL=y
+@@ -57,6 +60,7 @@
+ CPTCFG_ATH9K_HTC=m
+ # CPTCFG_ATH9K_HTC_DEBUGFS is not set
+ # CPTCFG_ATH9K_HWRNG is not set
++# CPTCFG_ATH9K_COMMON_SPECTRAL is not set
+ # CPTCFG_CARL9170 is not set
+ # CPTCFG_ATH6KL is not set
+ # CPTCFG_AR5523 is not set
+@@ -7705,6 +7709,7 @@
+ CPTCFG_BACKPORTED_CFG80211_REQUIRE_SIGNED_REGDB=y
+ CPTCFG_BACKPORTED_CFG80211_USE_KERNEL_REGDB_KEYS=y
+ CPTCFG_BACKPORTED_CFG80211_DEFAULT_PS=y
++CPTCFG_BACKPORTED_CFG80211_DEBUGFS=y
+ CPTCFG_BACKPORTED_CFG80211_CRDA_SUPPORT=y
+ CPTCFG_BACKPORTED_CFG80211_WEXT=y
+ CPTCFG_BACKPORTED_MAC80211=m
+@@ -7713,15 +7718,22 @@
+ CPTCFG_BACKPORTED_MAC80211_RC_DEFAULT_MINSTREL=y
+ CPTCFG_BACKPORTED_MAC80211_MESH=y
+ CPTCFG_BACKPORTED_MAC80211_LEDS=y
++CPTCFG_BACKPORTED_MAC80211_DEBUGFS=y
++CPTCFG_BACKPORTED_MAC80211_MESSAGE_TRACING=y
+ CPTCFG_BACKPORTED_WLAN=y
+ CPTCFG_BACKPORTED_WLAN_VENDOR_ADMTEK=y
+ CPTCFG_BACKPORTED_ATH_COMMON=m
+ CPTCFG_BACKPORTED_WLAN_VENDOR_ATH=y
++CPTCFG_BACKPORTED_ATH_DEBUG=y
++CPTCFG_BACKPORTED_ATH_TRACEPOINTS=y
+ CPTCFG_BACKPORTED_ATH9K_HW=m
+ CPTCFG_BACKPORTED_ATH9K_COMMON=m
++CPTCFG_BACKPORTED_ATH9K_COMMON_DEBUG=y
+ CPTCFG_BACKPORTED_ATH9K_BTCOEX_SUPPORT=y
+ CPTCFG_BACKPORTED_ATH9K=m
+ CPTCFG_BACKPORTED_ATH9K_PCI=y
++CPTCFG_BACKPORTED_ATH9K_DEBUGFS=y
++CPTCFG_BACKPORTED_ATH9K_STATION_STATISTICS=y
+ CPTCFG_BACKPORTED_ATH9K_RFKILL=y
+ CPTCFG_BACKPORTED_ATH9K_PCOEM=y
+ CPTCFG_BACKPORTED_ATH9K_HTC=m
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ani.o and two_streams/drivers/net/wireless/ath/ath9k/ani.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/antenna.o and two_streams/drivers/net/wireless/ath/ath9k/antenna.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar5008_phy.o and two_streams/drivers/net/wireless/ath/ath9k/ar5008_phy.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9002_calib.o and two_streams/drivers/net/wireless/ath/ath9k/ar9002_calib.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9002_mac.o and two_streams/drivers/net/wireless/ath/ath9k/ar9002_mac.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_aic.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_aic.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_calib.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_calib.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_eeprom.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_eeprom.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_hw.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_hw.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_mac.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_mac.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_mci.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_mci.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_paprd.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_paprd.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_phy.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_phy.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ar9003_rtt.o and two_streams/drivers/net/wireless/ath/ath9k/ar9003_rtt.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.ko and two_streams/drivers/net/wireless/ath/ath9k/ath9k_common.ko differ
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod two_streams/drivers/net/wireless/ath/ath9k/ath9k_common.mod
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod	2022-07-04 18:50:27.797434626 +0300
++++ two_streams/drivers/net/wireless/ath/ath9k/ath9k_common.mod	2022-07-04 18:21:42.477741980 +0300
+@@ -1,2 +1,2 @@
+-/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-beacon.o
++/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-debug.o
+ 
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod.c two_streams/drivers/net/wireless/ath/ath9k/ath9k_common.mod.c
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod.c	2022-07-04 18:39:53.937958002 +0300
++++ two_streams/drivers/net/wireless/ath/ath9k/ath9k_common.mod.c	2022-07-04 18:21:42.409742607 +0300
+@@ -25,7 +25,7 @@
+ static const char __module_depends[]
+ __used
+ __attribute__((section(".modinfo"))) =
+-"depends=compat,cfg80211,ath9k_hw,ath";
++"depends=compat,cfg80211,ath,ath9k_hw";
+ 
+ 
+-MODULE_INFO(srcversion, "FA59B0022A7F9C84AA9711B");
++MODULE_INFO(srcversion, "30B41B6DA530836BAD551B0");
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath9k/.ath9k_common.mod.cmd two_streams/drivers/net/wireless/ath/ath9k/.ath9k_common.mod.cmd
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath9k/.ath9k_common.mod.cmd	2022-07-04 18:50:27.797434626 +0300
++++ two_streams/drivers/net/wireless/ath/ath9k/.ath9k_common.mod.cmd	2022-07-04 18:21:42.477741980 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod := { echo  /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-beacon.o; echo; } > /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod
++cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod := { echo  /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-debug.o; echo; } > /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.mod.o and two_streams/drivers/net/wireless/ath/ath9k/ath9k_common.mod.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.o and two_streams/drivers/net/wireless/ath/ath9k/ath9k_common.o differ
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath9k/.ath9k_common.o.cmd two_streams/drivers/net/wireless/ath/ath9k/.ath9k_common.o.cmd
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath9k/.ath9k_common.o.cmd	2022-07-04 18:50:20.681574725 +0300
++++ two_streams/drivers/net/wireless/ath/ath9k/.ath9k_common.o.cmd	2022-07-04 18:21:42.465742090 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-beacon.o
++cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_common.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-debug.o
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_htc.ko and two_streams/drivers/net/wireless/ath/ath9k/ath9k_htc.ko differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_htc.o and two_streams/drivers/net/wireless/ath/ath9k/ath9k_htc.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_hw.ko and two_streams/drivers/net/wireless/ath/ath9k/ath9k_hw.ko differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k_hw.o and two_streams/drivers/net/wireless/ath/ath9k/ath9k_hw.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.ko and two_streams/drivers/net/wireless/ath/ath9k/ath9k.ko differ
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod two_streams/drivers/net/wireless/ath/ath9k/ath9k.mod
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod	2022-07-04 18:50:27.761435335 +0300
++++ two_streams/drivers/net/wireless/ath/ath9k/ath9k.mod	2022-07-04 18:21:42.477741980 +0300
+@@ -1,2 +1,2 @@
+-/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/gpio.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/recv.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/xmit.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/link.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/antenna.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/channel.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/mci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/pci.o
++/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/gpio.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/recv.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/xmit.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/link.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/antenna.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/channel.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/mci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/pci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/debug.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/debug_sta.o
+ 
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod.c two_streams/drivers/net/wireless/ath/ath9k/ath9k.mod.c
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod.c	2022-07-04 18:39:53.937958002 +0300
++++ two_streams/drivers/net/wireless/ath/ath9k/ath9k.mod.c	2022-07-04 18:21:42.477741980 +0300
+@@ -179,4 +179,4 @@
+ MODULE_ALIAS("pci:v0000168Cd00000036sv00001028sd0000020Ebc*sc*i*");
+ MODULE_ALIAS("pci:v0000168Cd00000036sv*sd*bc*sc*i*");
+ 
+-MODULE_INFO(srcversion, "6324D470B98689B95B5F764");
++MODULE_INFO(srcversion, "EFC25951A6FDD1E78CDDCDD");
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath9k/.ath9k.mod.cmd two_streams/drivers/net/wireless/ath/ath9k/.ath9k.mod.cmd
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath9k/.ath9k.mod.cmd	2022-07-04 18:50:27.761435335 +0300
++++ two_streams/drivers/net/wireless/ath/ath9k/.ath9k.mod.cmd	2022-07-04 18:21:42.477741980 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod := { echo  /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/gpio.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/recv.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/xmit.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/link.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/antenna.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/channel.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/mci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/pci.o; echo; } > /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod
++cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod := { echo  /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/gpio.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/recv.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/xmit.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/link.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/antenna.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/channel.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/mci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/pci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/debug.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/debug_sta.o; echo; } > /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.mod.o and two_streams/drivers/net/wireless/ath/ath9k/ath9k.mod.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.o and two_streams/drivers/net/wireless/ath/ath9k/ath9k.o differ
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath9k/.ath9k.o.cmd two_streams/drivers/net/wireless/ath/ath9k/.ath9k.o.cmd
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath9k/.ath9k.o.cmd	2022-07-04 18:49:57.066041026 +0300
++++ two_streams/drivers/net/wireless/ath/ath9k/.ath9k.o.cmd	2022-07-04 18:21:42.429742423 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/gpio.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/recv.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/xmit.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/link.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/antenna.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/channel.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/mci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/pci.o
++cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/ath9k.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/beacon.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/gpio.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/init.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/recv.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/xmit.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/link.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/antenna.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/channel.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/mci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/pci.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/debug.o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath9k/debug_sta.o
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/beacon.o and two_streams/drivers/net/wireless/ath/ath9k/beacon.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/btcoex.o and two_streams/drivers/net/wireless/ath/ath9k/btcoex.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/calib.o and two_streams/drivers/net/wireless/ath/ath9k/calib.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/channel.o and two_streams/drivers/net/wireless/ath/ath9k/channel.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-beacon.o and two_streams/drivers/net/wireless/ath/ath9k/common-beacon.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/common-init.o and two_streams/drivers/net/wireless/ath/ath9k/common-init.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/eeprom_4k.o and two_streams/drivers/net/wireless/ath/ath9k/eeprom_4k.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/eeprom_9287.o and two_streams/drivers/net/wireless/ath/ath9k/eeprom_9287.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/eeprom_def.o and two_streams/drivers/net/wireless/ath/ath9k/eeprom_def.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/eeprom.o and two_streams/drivers/net/wireless/ath/ath9k/eeprom.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/gpio.o and two_streams/drivers/net/wireless/ath/ath9k/gpio.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/htc_drv_beacon.o and two_streams/drivers/net/wireless/ath/ath9k/htc_drv_beacon.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/htc_drv_gpio.o and two_streams/drivers/net/wireless/ath/ath9k/htc_drv_gpio.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/htc_drv_init.o and two_streams/drivers/net/wireless/ath/ath9k/htc_drv_init.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/htc_drv_main.o and two_streams/drivers/net/wireless/ath/ath9k/htc_drv_main.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/htc_drv_txrx.o and two_streams/drivers/net/wireless/ath/ath9k/htc_drv_txrx.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/hw.o and two_streams/drivers/net/wireless/ath/ath9k/hw.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/init.o and two_streams/drivers/net/wireless/ath/ath9k/init.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/link.o and two_streams/drivers/net/wireless/ath/ath9k/link.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/mac.o and two_streams/drivers/net/wireless/ath/ath9k/mac.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/main.o and two_streams/drivers/net/wireless/ath/ath9k/main.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/mci.o and two_streams/drivers/net/wireless/ath/ath9k/mci.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/pci.o and two_streams/drivers/net/wireless/ath/ath9k/pci.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/recv.o and two_streams/drivers/net/wireless/ath/ath9k/recv.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/wmi.o and two_streams/drivers/net/wireless/ath/ath9k/wmi.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath9k/xmit.o and two_streams/drivers/net/wireless/ath/ath9k/xmit.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath.ko and two_streams/drivers/net/wireless/ath/ath.ko differ
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath.mod two_streams/drivers/net/wireless/ath/ath.mod
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath.mod	2022-07-04 18:49:46.990239978 +0300
++++ two_streams/drivers/net/wireless/ath/ath.mod	2022-07-04 18:21:42.549741317 +0300
+@@ -1,2 +1,2 @@
+-/root/backports-5.3.6-1/drivers/net/wireless/ath/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/regd.o /root/backports-5.3.6-1/drivers/net/wireless/ath/hw.o /root/backports-5.3.6-1/drivers/net/wireless/ath/key.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pattern_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pri_detector.o
++/root/backports-5.3.6-1/drivers/net/wireless/ath/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/regd.o /root/backports-5.3.6-1/drivers/net/wireless/ath/hw.o /root/backports-5.3.6-1/drivers/net/wireless/ath/key.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pattern_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pri_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/debug.o /root/backports-5.3.6-1/drivers/net/wireless/ath/trace.o
+ 
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/ath.mod.c two_streams/drivers/net/wireless/ath/ath.mod.c
+--- backports-5.3.6-1/drivers/net/wireless/ath/ath.mod.c	2022-07-04 18:39:53.937958002 +0300
++++ two_streams/drivers/net/wireless/ath/ath.mod.c	2022-07-04 18:21:42.537741427 +0300
+@@ -24,4 +24,4 @@
+ "depends=cfg80211";
+ 
+ 
+-MODULE_INFO(srcversion, "60FECA2155F691E44B7D4E5");
++MODULE_INFO(srcversion, "B964DA5472F72E15EC3B617");
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/.ath.mod.cmd two_streams/drivers/net/wireless/ath/.ath.mod.cmd
+--- backports-5.3.6-1/drivers/net/wireless/ath/.ath.mod.cmd	2022-07-04 18:49:46.990239978 +0300
++++ two_streams/drivers/net/wireless/ath/.ath.mod.cmd	2022-07-04 18:21:42.549741317 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath.mod := { echo  /root/backports-5.3.6-1/drivers/net/wireless/ath/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/regd.o /root/backports-5.3.6-1/drivers/net/wireless/ath/hw.o /root/backports-5.3.6-1/drivers/net/wireless/ath/key.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pattern_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pri_detector.o; echo; } > /root/backports-5.3.6-1/drivers/net/wireless/ath/ath.mod
++cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath.mod := { echo  /root/backports-5.3.6-1/drivers/net/wireless/ath/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/regd.o /root/backports-5.3.6-1/drivers/net/wireless/ath/hw.o /root/backports-5.3.6-1/drivers/net/wireless/ath/key.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pattern_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pri_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/debug.o /root/backports-5.3.6-1/drivers/net/wireless/ath/trace.o; echo; } > /root/backports-5.3.6-1/drivers/net/wireless/ath/ath.mod
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath.mod.o and two_streams/drivers/net/wireless/ath/ath.mod.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/ath.o and two_streams/drivers/net/wireless/ath/ath.o differ
+diff -ruN backports-5.3.6-1/drivers/net/wireless/ath/.ath.o.cmd two_streams/drivers/net/wireless/ath/.ath.o.cmd
+--- backports-5.3.6-1/drivers/net/wireless/ath/.ath.o.cmd	2022-07-04 18:49:46.962240530 +0300
++++ two_streams/drivers/net/wireless/ath/.ath.o.cmd	2022-07-04 18:21:42.549741317 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath.o /root/backports-5.3.6-1/drivers/net/wireless/ath/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/regd.o /root/backports-5.3.6-1/drivers/net/wireless/ath/hw.o /root/backports-5.3.6-1/drivers/net/wireless/ath/key.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pattern_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pri_detector.o
++cmd_/root/backports-5.3.6-1/drivers/net/wireless/ath/ath.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/drivers/net/wireless/ath/ath.o /root/backports-5.3.6-1/drivers/net/wireless/ath/main.o /root/backports-5.3.6-1/drivers/net/wireless/ath/regd.o /root/backports-5.3.6-1/drivers/net/wireless/ath/hw.o /root/backports-5.3.6-1/drivers/net/wireless/ath/key.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pattern_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/dfs_pri_detector.o /root/backports-5.3.6-1/drivers/net/wireless/ath/debug.o /root/backports-5.3.6-1/drivers/net/wireless/ath/trace.o
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/key.o and two_streams/drivers/net/wireless/ath/key.o differ
+Binary files backports-5.3.6-1/drivers/net/wireless/ath/main.o and two_streams/drivers/net/wireless/ath/main.o differ
+Binary files backports-5.3.6-1/net/mac80211/agg-rx.o and two_streams/net/mac80211/agg-rx.o differ
+Binary files backports-5.3.6-1/net/mac80211/agg-tx.o and two_streams/net/mac80211/agg-tx.o differ
+Binary files backports-5.3.6-1/net/mac80211/cfg.o and two_streams/net/mac80211/cfg.o differ
+Binary files backports-5.3.6-1/net/mac80211/chan.o and two_streams/net/mac80211/chan.o differ
+Binary files backports-5.3.6-1/net/mac80211/driver-ops.o and two_streams/net/mac80211/driver-ops.o differ
+Binary files backports-5.3.6-1/net/mac80211/ethtool.o and two_streams/net/mac80211/ethtool.o differ
+Binary files backports-5.3.6-1/net/mac80211/fils_aead.o and two_streams/net/mac80211/fils_aead.o differ
+Binary files backports-5.3.6-1/net/mac80211/he.o and two_streams/net/mac80211/he.o differ
+Binary files backports-5.3.6-1/net/mac80211/ht.o and two_streams/net/mac80211/ht.o differ
+Binary files backports-5.3.6-1/net/mac80211/ibss.o and two_streams/net/mac80211/ibss.o differ
+Binary files backports-5.3.6-1/net/mac80211/iface.o and two_streams/net/mac80211/iface.o differ
+Binary files backports-5.3.6-1/net/mac80211/key.o and two_streams/net/mac80211/key.o differ
+Binary files backports-5.3.6-1/net/mac80211/mac80211.ko and two_streams/net/mac80211/mac80211.ko differ
+diff -ruN backports-5.3.6-1/net/mac80211/mac80211.mod two_streams/net/mac80211/mac80211.mod
+--- backports-5.3.6-1/net/mac80211/mac80211.mod	2022-07-04 18:51:23.336341283 +0300
++++ two_streams/net/mac80211/mac80211.mod	2022-07-04 18:21:25.597897675 +0300
+@@ -1,2 +1,2 @@
+-/root/backports-5.3.6-1/net/mac80211/main.o /root/backports-5.3.6-1/net/mac80211/status.o /root/backports-5.3.6-1/net/mac80211/driver-ops.o /root/backports-5.3.6-1/net/mac80211/sta_info.o /root/backports-5.3.6-1/net/mac80211/wep.o /root/backports-5.3.6-1/net/mac80211/aead_api.o /root/backports-5.3.6-1/net/mac80211/wpa.o /root/backports-5.3.6-1/net/mac80211/scan.o /root/backports-5.3.6-1/net/mac80211/offchannel.o /root/backports-5.3.6-1/net/mac80211/ht.o /root/backports-5.3.6-1/net/mac80211/agg-tx.o /root/backports-5.3.6-1/net/mac80211/agg-rx.o /root/backports-5.3.6-1/net/mac80211/vht.o /root/backports-5.3.6-1/net/mac80211/he.o /root/backports-5.3.6-1/net/mac80211/ibss.o /root/backports-5.3.6-1/net/mac80211/iface.o /root/backports-5.3.6-1/net/mac80211/rate.o /root/backports-5.3.6-1/net/mac80211/michael.o /root/backports-5.3.6-1/net/mac80211/tkip.o /root/backports-5.3.6-1/net/mac80211/aes_cmac.o /root/backports-5.3.6-1/net/mac80211/aes_gmac.o /root/backports-5.3.6-1/net/mac80211/fils_aead.o /root/backports-5.3.6-1/net/mac80211/cfg.o /root/backports-5.3.6-1/net/mac80211/ethtool.o /root/backports-5.3.6-1/net/mac80211/rx.o /root/backports-5.3.6-1/net/mac80211/spectmgmt.o /root/backports-5.3.6-1/net/mac80211/tx.o /root/backports-5.3.6-1/net/mac80211/key.o /root/backports-5.3.6-1/net/mac80211/util.o /root/backports-5.3.6-1/net/mac80211/wme.o /root/backports-5.3.6-1/net/mac80211/chan.o /root/backports-5.3.6-1/net/mac80211/trace.o /root/backports-5.3.6-1/net/mac80211/mlme.o /root/backports-5.3.6-1/net/mac80211/tdls.o /root/backports-5.3.6-1/net/mac80211/ocb.o /root/backports-5.3.6-1/net/mac80211/led.o /root/backports-5.3.6-1/net/mac80211/mesh.o /root/backports-5.3.6-1/net/mac80211/mesh_pathtbl.o /root/backports-5.3.6-1/net/mac80211/mesh_plink.o /root/backports-5.3.6-1/net/mac80211/mesh_hwmp.o /root/backports-5.3.6-1/net/mac80211/mesh_sync.o /root/backports-5.3.6-1/net/mac80211/mesh_ps.o /root/backports-5.3.6-1/net/mac80211/pm.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.o
++/root/backports-5.3.6-1/net/mac80211/main.o /root/backports-5.3.6-1/net/mac80211/status.o /root/backports-5.3.6-1/net/mac80211/driver-ops.o /root/backports-5.3.6-1/net/mac80211/sta_info.o /root/backports-5.3.6-1/net/mac80211/wep.o /root/backports-5.3.6-1/net/mac80211/aead_api.o /root/backports-5.3.6-1/net/mac80211/wpa.o /root/backports-5.3.6-1/net/mac80211/scan.o /root/backports-5.3.6-1/net/mac80211/offchannel.o /root/backports-5.3.6-1/net/mac80211/ht.o /root/backports-5.3.6-1/net/mac80211/agg-tx.o /root/backports-5.3.6-1/net/mac80211/agg-rx.o /root/backports-5.3.6-1/net/mac80211/vht.o /root/backports-5.3.6-1/net/mac80211/he.o /root/backports-5.3.6-1/net/mac80211/ibss.o /root/backports-5.3.6-1/net/mac80211/iface.o /root/backports-5.3.6-1/net/mac80211/rate.o /root/backports-5.3.6-1/net/mac80211/michael.o /root/backports-5.3.6-1/net/mac80211/tkip.o /root/backports-5.3.6-1/net/mac80211/aes_cmac.o /root/backports-5.3.6-1/net/mac80211/aes_gmac.o /root/backports-5.3.6-1/net/mac80211/fils_aead.o /root/backports-5.3.6-1/net/mac80211/cfg.o /root/backports-5.3.6-1/net/mac80211/ethtool.o /root/backports-5.3.6-1/net/mac80211/rx.o /root/backports-5.3.6-1/net/mac80211/spectmgmt.o /root/backports-5.3.6-1/net/mac80211/tx.o /root/backports-5.3.6-1/net/mac80211/key.o /root/backports-5.3.6-1/net/mac80211/util.o /root/backports-5.3.6-1/net/mac80211/wme.o /root/backports-5.3.6-1/net/mac80211/chan.o /root/backports-5.3.6-1/net/mac80211/trace.o /root/backports-5.3.6-1/net/mac80211/mlme.o /root/backports-5.3.6-1/net/mac80211/tdls.o /root/backports-5.3.6-1/net/mac80211/ocb.o /root/backports-5.3.6-1/net/mac80211/led.o /root/backports-5.3.6-1/net/mac80211/debugfs.o /root/backports-5.3.6-1/net/mac80211/debugfs_sta.o /root/backports-5.3.6-1/net/mac80211/debugfs_netdev.o /root/backports-5.3.6-1/net/mac80211/debugfs_key.o /root/backports-5.3.6-1/net/mac80211/mesh.o /root/backports-5.3.6-1/net/mac80211/mesh_pathtbl.o /root/backports-5.3.6-1/net/mac80211/mesh_plink.o /root/backports-5.3.6-1/net/mac80211/mesh_hwmp.o /root/backports-5.3.6-1/net/mac80211/mesh_sync.o /root/backports-5.3.6-1/net/mac80211/mesh_ps.o /root/backports-5.3.6-1/net/mac80211/pm.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_debugfs.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht_debugfs.o
+ 
+diff -ruN backports-5.3.6-1/net/mac80211/mac80211.mod.c two_streams/net/mac80211/mac80211.mod.c
+--- backports-5.3.6-1/net/mac80211/mac80211.mod.c	2022-07-04 18:51:52.595765279 +0300
++++ two_streams/net/mac80211/mac80211.mod.c	2022-07-04 18:21:23.957912802 +0300
+@@ -28,4 +28,4 @@
+ "depends=cfg80211,compat,libarc4";
+ 
+ 
+-MODULE_INFO(srcversion, "2594948D12DDCF72C34D72E");
++MODULE_INFO(srcversion, "544FEE09CF463B126AA480C");
+diff -ruN backports-5.3.6-1/net/mac80211/.mac80211.mod.cmd two_streams/net/mac80211/.mac80211.mod.cmd
+--- backports-5.3.6-1/net/mac80211/.mac80211.mod.cmd	2022-07-04 18:51:23.336341283 +0300
++++ two_streams/net/mac80211/.mac80211.mod.cmd	2022-07-04 18:21:25.609897565 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/net/mac80211/mac80211.mod := { echo  /root/backports-5.3.6-1/net/mac80211/main.o /root/backports-5.3.6-1/net/mac80211/status.o /root/backports-5.3.6-1/net/mac80211/driver-ops.o /root/backports-5.3.6-1/net/mac80211/sta_info.o /root/backports-5.3.6-1/net/mac80211/wep.o /root/backports-5.3.6-1/net/mac80211/aead_api.o /root/backports-5.3.6-1/net/mac80211/wpa.o /root/backports-5.3.6-1/net/mac80211/scan.o /root/backports-5.3.6-1/net/mac80211/offchannel.o /root/backports-5.3.6-1/net/mac80211/ht.o /root/backports-5.3.6-1/net/mac80211/agg-tx.o /root/backports-5.3.6-1/net/mac80211/agg-rx.o /root/backports-5.3.6-1/net/mac80211/vht.o /root/backports-5.3.6-1/net/mac80211/he.o /root/backports-5.3.6-1/net/mac80211/ibss.o /root/backports-5.3.6-1/net/mac80211/iface.o /root/backports-5.3.6-1/net/mac80211/rate.o /root/backports-5.3.6-1/net/mac80211/michael.o /root/backports-5.3.6-1/net/mac80211/tkip.o /root/backports-5.3.6-1/net/mac80211/aes_cmac.o /root/backports-5.3.6-1/net/mac80211/aes_gmac.o /root/backports-5.3.6-1/net/mac80211/fils_aead.o /root/backports-5.3.6-1/net/mac80211/cfg.o /root/backports-5.3.6-1/net/mac80211/ethtool.o /root/backports-5.3.6-1/net/mac80211/rx.o /root/backports-5.3.6-1/net/mac80211/spectmgmt.o /root/backports-5.3.6-1/net/mac80211/tx.o /root/backports-5.3.6-1/net/mac80211/key.o /root/backports-5.3.6-1/net/mac80211/util.o /root/backports-5.3.6-1/net/mac80211/wme.o /root/backports-5.3.6-1/net/mac80211/chan.o /root/backports-5.3.6-1/net/mac80211/trace.o /root/backports-5.3.6-1/net/mac80211/mlme.o /root/backports-5.3.6-1/net/mac80211/tdls.o /root/backports-5.3.6-1/net/mac80211/ocb.o /root/backports-5.3.6-1/net/mac80211/led.o /root/backports-5.3.6-1/net/mac80211/mesh.o /root/backports-5.3.6-1/net/mac80211/mesh_pathtbl.o /root/backports-5.3.6-1/net/mac80211/mesh_plink.o /root/backports-5.3.6-1/net/mac80211/mesh_hwmp.o /root/backports-5.3.6-1/net/mac80211/mesh_sync.o /root/backports-5.3.6-1/net/mac80211/mesh_ps.o /root/backports-5.3.6-1/net/mac80211/pm.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.o; echo; } > /root/backports-5.3.6-1/net/mac80211/mac80211.mod
++cmd_/root/backports-5.3.6-1/net/mac80211/mac80211.mod := { echo  /root/backports-5.3.6-1/net/mac80211/main.o /root/backports-5.3.6-1/net/mac80211/status.o /root/backports-5.3.6-1/net/mac80211/driver-ops.o /root/backports-5.3.6-1/net/mac80211/sta_info.o /root/backports-5.3.6-1/net/mac80211/wep.o /root/backports-5.3.6-1/net/mac80211/aead_api.o /root/backports-5.3.6-1/net/mac80211/wpa.o /root/backports-5.3.6-1/net/mac80211/scan.o /root/backports-5.3.6-1/net/mac80211/offchannel.o /root/backports-5.3.6-1/net/mac80211/ht.o /root/backports-5.3.6-1/net/mac80211/agg-tx.o /root/backports-5.3.6-1/net/mac80211/agg-rx.o /root/backports-5.3.6-1/net/mac80211/vht.o /root/backports-5.3.6-1/net/mac80211/he.o /root/backports-5.3.6-1/net/mac80211/ibss.o /root/backports-5.3.6-1/net/mac80211/iface.o /root/backports-5.3.6-1/net/mac80211/rate.o /root/backports-5.3.6-1/net/mac80211/michael.o /root/backports-5.3.6-1/net/mac80211/tkip.o /root/backports-5.3.6-1/net/mac80211/aes_cmac.o /root/backports-5.3.6-1/net/mac80211/aes_gmac.o /root/backports-5.3.6-1/net/mac80211/fils_aead.o /root/backports-5.3.6-1/net/mac80211/cfg.o /root/backports-5.3.6-1/net/mac80211/ethtool.o /root/backports-5.3.6-1/net/mac80211/rx.o /root/backports-5.3.6-1/net/mac80211/spectmgmt.o /root/backports-5.3.6-1/net/mac80211/tx.o /root/backports-5.3.6-1/net/mac80211/key.o /root/backports-5.3.6-1/net/mac80211/util.o /root/backports-5.3.6-1/net/mac80211/wme.o /root/backports-5.3.6-1/net/mac80211/chan.o /root/backports-5.3.6-1/net/mac80211/trace.o /root/backports-5.3.6-1/net/mac80211/mlme.o /root/backports-5.3.6-1/net/mac80211/tdls.o /root/backports-5.3.6-1/net/mac80211/ocb.o /root/backports-5.3.6-1/net/mac80211/led.o /root/backports-5.3.6-1/net/mac80211/debugfs.o /root/backports-5.3.6-1/net/mac80211/debugfs_sta.o /root/backports-5.3.6-1/net/mac80211/debugfs_netdev.o /root/backports-5.3.6-1/net/mac80211/debugfs_key.o /root/backports-5.3.6-1/net/mac80211/mesh.o /root/backports-5.3.6-1/net/mac80211/mesh_pathtbl.o /root/backports-5.3.6-1/net/mac80211/mesh_plink.o /root/backports-5.3.6-1/net/mac80211/mesh_hwmp.o /root/backports-5.3.6-1/net/mac80211/mesh_sync.o /root/backports-5.3.6-1/net/mac80211/mesh_ps.o /root/backports-5.3.6-1/net/mac80211/pm.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_debugfs.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht_debugfs.o; echo; } > /root/backports-5.3.6-1/net/mac80211/mac80211.mod
+Binary files backports-5.3.6-1/net/mac80211/mac80211.mod.o and two_streams/net/mac80211/mac80211.mod.o differ
+Binary files backports-5.3.6-1/net/mac80211/mac80211.o and two_streams/net/mac80211/mac80211.o differ
+diff -ruN backports-5.3.6-1/net/mac80211/.mac80211.o.cmd two_streams/net/mac80211/.mac80211.o.cmd
+--- backports-5.3.6-1/net/mac80211/.mac80211.o.cmd	2022-07-04 18:51:23.312341756 +0300
++++ two_streams/net/mac80211/.mac80211.o.cmd	2022-07-04 18:21:25.589897748 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/net/mac80211/mac80211.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/net/mac80211/mac80211.o /root/backports-5.3.6-1/net/mac80211/main.o /root/backports-5.3.6-1/net/mac80211/status.o /root/backports-5.3.6-1/net/mac80211/driver-ops.o /root/backports-5.3.6-1/net/mac80211/sta_info.o /root/backports-5.3.6-1/net/mac80211/wep.o /root/backports-5.3.6-1/net/mac80211/aead_api.o /root/backports-5.3.6-1/net/mac80211/wpa.o /root/backports-5.3.6-1/net/mac80211/scan.o /root/backports-5.3.6-1/net/mac80211/offchannel.o /root/backports-5.3.6-1/net/mac80211/ht.o /root/backports-5.3.6-1/net/mac80211/agg-tx.o /root/backports-5.3.6-1/net/mac80211/agg-rx.o /root/backports-5.3.6-1/net/mac80211/vht.o /root/backports-5.3.6-1/net/mac80211/he.o /root/backports-5.3.6-1/net/mac80211/ibss.o /root/backports-5.3.6-1/net/mac80211/iface.o /root/backports-5.3.6-1/net/mac80211/rate.o /root/backports-5.3.6-1/net/mac80211/michael.o /root/backports-5.3.6-1/net/mac80211/tkip.o /root/backports-5.3.6-1/net/mac80211/aes_cmac.o /root/backports-5.3.6-1/net/mac80211/aes_gmac.o /root/backports-5.3.6-1/net/mac80211/fils_aead.o /root/backports-5.3.6-1/net/mac80211/cfg.o /root/backports-5.3.6-1/net/mac80211/ethtool.o /root/backports-5.3.6-1/net/mac80211/rx.o /root/backports-5.3.6-1/net/mac80211/spectmgmt.o /root/backports-5.3.6-1/net/mac80211/tx.o /root/backports-5.3.6-1/net/mac80211/key.o /root/backports-5.3.6-1/net/mac80211/util.o /root/backports-5.3.6-1/net/mac80211/wme.o /root/backports-5.3.6-1/net/mac80211/chan.o /root/backports-5.3.6-1/net/mac80211/trace.o /root/backports-5.3.6-1/net/mac80211/mlme.o /root/backports-5.3.6-1/net/mac80211/tdls.o /root/backports-5.3.6-1/net/mac80211/ocb.o /root/backports-5.3.6-1/net/mac80211/led.o /root/backports-5.3.6-1/net/mac80211/mesh.o /root/backports-5.3.6-1/net/mac80211/mesh_pathtbl.o /root/backports-5.3.6-1/net/mac80211/mesh_plink.o /root/backports-5.3.6-1/net/mac80211/mesh_hwmp.o /root/backports-5.3.6-1/net/mac80211/mesh_sync.o /root/backports-5.3.6-1/net/mac80211/mesh_ps.o /root/backports-5.3.6-1/net/mac80211/pm.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.o
++cmd_/root/backports-5.3.6-1/net/mac80211/mac80211.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/net/mac80211/mac80211.o /root/backports-5.3.6-1/net/mac80211/main.o /root/backports-5.3.6-1/net/mac80211/status.o /root/backports-5.3.6-1/net/mac80211/driver-ops.o /root/backports-5.3.6-1/net/mac80211/sta_info.o /root/backports-5.3.6-1/net/mac80211/wep.o /root/backports-5.3.6-1/net/mac80211/aead_api.o /root/backports-5.3.6-1/net/mac80211/wpa.o /root/backports-5.3.6-1/net/mac80211/scan.o /root/backports-5.3.6-1/net/mac80211/offchannel.o /root/backports-5.3.6-1/net/mac80211/ht.o /root/backports-5.3.6-1/net/mac80211/agg-tx.o /root/backports-5.3.6-1/net/mac80211/agg-rx.o /root/backports-5.3.6-1/net/mac80211/vht.o /root/backports-5.3.6-1/net/mac80211/he.o /root/backports-5.3.6-1/net/mac80211/ibss.o /root/backports-5.3.6-1/net/mac80211/iface.o /root/backports-5.3.6-1/net/mac80211/rate.o /root/backports-5.3.6-1/net/mac80211/michael.o /root/backports-5.3.6-1/net/mac80211/tkip.o /root/backports-5.3.6-1/net/mac80211/aes_cmac.o /root/backports-5.3.6-1/net/mac80211/aes_gmac.o /root/backports-5.3.6-1/net/mac80211/fils_aead.o /root/backports-5.3.6-1/net/mac80211/cfg.o /root/backports-5.3.6-1/net/mac80211/ethtool.o /root/backports-5.3.6-1/net/mac80211/rx.o /root/backports-5.3.6-1/net/mac80211/spectmgmt.o /root/backports-5.3.6-1/net/mac80211/tx.o /root/backports-5.3.6-1/net/mac80211/key.o /root/backports-5.3.6-1/net/mac80211/util.o /root/backports-5.3.6-1/net/mac80211/wme.o /root/backports-5.3.6-1/net/mac80211/chan.o /root/backports-5.3.6-1/net/mac80211/trace.o /root/backports-5.3.6-1/net/mac80211/mlme.o /root/backports-5.3.6-1/net/mac80211/tdls.o /root/backports-5.3.6-1/net/mac80211/ocb.o /root/backports-5.3.6-1/net/mac80211/led.o /root/backports-5.3.6-1/net/mac80211/debugfs.o /root/backports-5.3.6-1/net/mac80211/debugfs_sta.o /root/backports-5.3.6-1/net/mac80211/debugfs_netdev.o /root/backports-5.3.6-1/net/mac80211/debugfs_key.o /root/backports-5.3.6-1/net/mac80211/mesh.o /root/backports-5.3.6-1/net/mac80211/mesh_pathtbl.o /root/backports-5.3.6-1/net/mac80211/mesh_plink.o /root/backports-5.3.6-1/net/mac80211/mesh_hwmp.o /root/backports-5.3.6-1/net/mac80211/mesh_sync.o /root/backports-5.3.6-1/net/mac80211/mesh_ps.o /root/backports-5.3.6-1/net/mac80211/pm.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_debugfs.o /root/backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht_debugfs.o
+Binary files backports-5.3.6-1/net/mac80211/main.o and two_streams/net/mac80211/main.o differ
+Binary files backports-5.3.6-1/net/mac80211/mesh_hwmp.o and two_streams/net/mac80211/mesh_hwmp.o differ
+Binary files backports-5.3.6-1/net/mac80211/mesh.o and two_streams/net/mac80211/mesh.o differ
+Binary files backports-5.3.6-1/net/mac80211/mesh_pathtbl.o and two_streams/net/mac80211/mesh_pathtbl.o differ
+Binary files backports-5.3.6-1/net/mac80211/mesh_plink.o and two_streams/net/mac80211/mesh_plink.o differ
+Binary files backports-5.3.6-1/net/mac80211/mesh_ps.o and two_streams/net/mac80211/mesh_ps.o differ
+Binary files backports-5.3.6-1/net/mac80211/mesh_sync.o and two_streams/net/mac80211/mesh_sync.o differ
+Binary files backports-5.3.6-1/net/mac80211/mlme.o and two_streams/net/mac80211/mlme.o differ
+Binary files backports-5.3.6-1/net/mac80211/ocb.o and two_streams/net/mac80211/ocb.o differ
+Binary files backports-5.3.6-1/net/mac80211/offchannel.o and two_streams/net/mac80211/offchannel.o differ
+Binary files backports-5.3.6-1/net/mac80211/pm.o and two_streams/net/mac80211/pm.o differ
+Binary files backports-5.3.6-1/net/mac80211/rate.o and two_streams/net/mac80211/rate.o differ
+diff -ruN backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.c two_streams/net/mac80211/rc80211_minstrel_ht.c
+--- backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.c	2022-07-04 19:12:04.807821660 +0300
++++ two_streams/net/mac80211/rc80211_minstrel_ht.c	2022-07-04 19:09:23.927007766 +0300
+@@ -15,6 +15,10 @@
+ #include "rc80211_minstrel.h"
+ #include "rc80211_minstrel_ht.h"
+ 
++
++#define CUSTOM_DEBUG
++
++
+ #define AVG_AMPDU_SIZE	16
+ #define AVG_PKT_SIZE	1200
+ 
+@@ -233,7 +237,14 @@
+ static u8 sample_table[SAMPLE_COLUMNS][MCS_GROUP_RATES] __read_mostly;
+ 
+ static void
+-minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi);
++minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi, int rix1, int rix2, int rix3, int try1, int try2, int try3);
++
++// Custom Functions
++void short_term_stats_reset(struct minstrel_ht_sta *mi);
++void reset_stats(struct minstrel_priv *mp, struct minstrel_ht_sta *mi);
++void recovery(struct minstrel_priv *mp, struct minstrel_ht_sta *mi);
++static void minstrel_ht_set_rate(struct minstrel_priv *mp, struct minstrel_ht_sta *mi,
++		                     struct ieee80211_sta_rates *ratetbl, int offset, int index, int retries);
+ 
+ /*
+  * Some VHT MCSes are invalid (when Ndbps / Nes is not an integer)
+@@ -299,7 +310,6 @@
+ 		      struct ieee80211_tx_rate *rate)
+ {
+ 	int group, idx;
+-
+ 	if (rate->flags & IEEE80211_TX_RC_MCS) {
+ 		group = minstrel_ht_get_group_idx(rate);
+ 		idx = rate->idx % 8;
+@@ -676,6 +686,7 @@
+ 	}
+ }
+ 
++/*
+ static void
+ minstrel_downgrade_rate(struct minstrel_ht_sta *mi, u16 *idx, bool primary)
+ {
+@@ -699,6 +710,7 @@
+ 		break;
+ 	}
+ }
++*/
+ 
+ static void
+ minstrel_aggr_check(struct ieee80211_sta *pubsta, struct sk_buff *skb)
+@@ -723,6 +735,98 @@
+ 	ieee80211_start_tx_ba_session(pubsta, tid, 0);
+ }
+ 
++
++// Function corresponds to update_rate() function mentioned in the paper
++void reset_stats(struct minstrel_priv *mp, struct minstrel_ht_sta *mi){
++	int old_group;
++        int new_group;
++	int old_mcs_index;
++	int new_mcs_index;
++	
++	// Reset consecutive successes and failures
++	short_term_stats_reset(mi);
++	
++	// Return to not lose changes due to minstrel_ht_update_stats()
++	if(mi->recovery){
++		return;
++	}
++
++	// Find old rate to detect if rate increase	
++	old_group 	= mi->max_tp_rate[0] / MCS_GROUP_RATES;
++	old_mcs_index	= mi->max_tp_rate[0] % MCS_GROUP_RATES;
++	
++	// tx_rate	
++	minstrel_ht_update_stats(mp, mi);
++
++	// Find new rate to detect if rate increase	
++	new_group 	= mi->max_tp_rate[0] / MCS_GROUP_RATES;
++	new_mcs_index 	= mi->max_tp_rate[0] % MCS_GROUP_RATES;
++
++	if(new_group < old_group){
++		return;
++	}
++	else if(new_group > old_group){
++		mi->probe_interval = 20; //ms
++	}
++	else {
++		if(new_mcs_index > old_mcs_index){
++			mi->probe_interval = 20; //ms
++		}
++	}
++}
++
++
++
++// Function corresponds to rate_statistics() function mentioned in the paper
++void short_term_rate_stats(struct minstrel_priv *mp, struct minstrel_ht_sta *mi){
++	mi->recovery = false;
++
++	// At least one failed attempt was detected
++	if(mi->consecutive_retries >= 2){
++		mi->consecutive_successes = 0;
++		mi->consecutive_failures = mi->consecutive_retries - 1;
++	}
++
++	// A single attempt was required to send data
++	else if(mi->consecutive_retries){
++		mi->consecutive_successes++;	
++		mi->consecutive_failures = 0;	
++	}
++
++	// Consecutive Successes: 10
++	if(mi->consecutive_successes >= 10){
++		mi->probe_interval = 90; 	//ms
++	}
++
++	// Consecutive Failures: 4
++	else if(mi->consecutive_failures >= 4){
++		mi->probe_interval = 10;	//ms
++	}
++
++	// Consecutive Failures: 2
++	else if(mi->consecutive_failures >= 2){
++
++#ifdef CUSTOM_DEBUG 
++		printk("Recovery State");
++#endif	
++		// Fallback to previous TX Rate
++		recovery(mp, mi);
++
++		// Reset consecutive successes and failures, update_rate() mentioned in paper
++		reset_stats(mp, mi);
++
++		mi->probe_interval = 30;	//ms
++
++		return; 
++	}
++
++	// This is not mentioned in the paper. Consecutive retries are
++	// reset in order to correctly compute successes without merging
++	// the iteration of statistics (the for loop above this function
++	// call) with this particular function.
++	mi->consecutive_retries = 0;
++}
++
+ static void
+ minstrel_ht_tx_status(void *priv, struct ieee80211_supported_band *sband,
+                       void *priv_sta, struct ieee80211_tx_status *st)
+@@ -731,10 +835,15 @@
+ 	struct minstrel_ht_sta_priv *msp = priv_sta;
+ 	struct minstrel_ht_sta *mi = &msp->ht;
+ 	struct ieee80211_tx_rate *ar = info->status.rates;
+-	struct minstrel_rate_stats *rate, *rate2;
++	struct minstrel_rate_stats *rate;
+ 	struct minstrel_priv *mp = priv;
+-	bool last, update = false;
++	bool last;
++	long long int current_time;
++	int rix1, rix2, rix3;
++	int try1, try2, try3;
+ 	int i;
++	int mcs_index;
++	int tx_rate;
+ 
+ 	if (!msp->is_ht)
+ 		return mac80211_minstrel.tx_status_ext(priv, sband,
+@@ -771,41 +880,183 @@
+ 		       !minstrel_ht_txstat_valid(mp, &ar[i + 1]);
+ 
+ 		rate = minstrel_ht_get_stats(mp, mi, &ar[i]);
+-
++		
+ 		if (last)
+ 			rate->success += info->status.ampdu_ack_len;
++			
++		// Increment consecutive_retries
++		mi->consecutive_retries = mi->consecutive_retries + ar[i].count; 
+ 
+ 		rate->attempts += ar[i].count * info->status.ampdu_len;
+ 	}
+ 
+-	/*
+-	 * check for sudden death of spatial multiplexing,
+-	 * downgrade to a lower number of streams if necessary.
+-	 */
+-	rate = minstrel_get_ratestats(mi, mi->max_tp_rate[0]);
+-	if (rate->attempts > 30 &&
+-	    MINSTREL_FRAC(rate->success, rate->attempts) <
+-	    MINSTREL_FRAC(20, 100)) {
+-		minstrel_downgrade_rate(mi, &mi->max_tp_rate[0], true);
+-		update = true;
+-	}
+-
+-	rate2 = minstrel_get_ratestats(mi, mi->max_tp_rate[1]);
+-	if (rate2->attempts > 30 &&
+-	    MINSTREL_FRAC(rate2->success, rate2->attempts) <
+-	    MINSTREL_FRAC(20, 100)) {
+-		minstrel_downgrade_rate(mi, &mi->max_tp_rate[1], false);
+-		update = true;
+-	}
+-
+-	if (time_after(jiffies, mi->last_stats_update +
+-				(mp->update_interval / 2 * HZ) / 1000)) {
+-		update = true;
++	// Rate short term statistics (corresponds to rate_statistics() from the given paper)
++	short_term_rate_stats(mp, mi);
++	
++#ifdef CUSTOM_DEBUG
++	for(i = 0; i < MAX_THR_RATES; i++){
++		printk("max_tp_rates[%d]: %d\n", i, mi->max_tp_rate[i]);
++	}
++	printk("Sucesses (%d), Failures (%d), Retries(%d)", mi->consecutive_successes, mi->consecutive_failures, mi->consecutive_retries);
++#endif
++
++	// Reset consecutive successes and failures (correspond to update_rate())
++	// Reseting these stats only when failures are detected since the successes 
++	// are accumulated contrary to failires, which are computed once.
++	if(!mi->consecutive_successes){
++		reset_stats(mp, mi);
++	}
++
++	// Enter probe state
++	current_time = NANO_TO_MS(ktime_get());
++
++	// TX state and TX period just started 
++	if(mi->state && !mi->tx_period_start){
++		mi->tx_period_start = current_time;
++	}
++	
++	// TX state and TX period finished, thus move to Probe state	
++	if(mi->state && (current_time - mi->tx_period_start) > mi->probe_interval){
++		mi->state = false;			
++		
++		// Reset TX period
++		mi->tx_period_start = 0;
++	}
++	
++	// Probe state and Probe period just started
++	if(!mi->state && !mi->probe_period_start){
++		mi->probe_period_start = current_time;
++
++		// Probe period just started, thus first probe flag is valid
++		mi->first_probe = false;
++	}
++	
++	// Probe state and Probe period fininshed, thus move to TX state
++	if(!mi->state && (current_time - mi->probe_period_start) > mi->tx_interval){	
++		// Probe state and Probe period finished, thus move to TX state
++		mi->state = true;
++
++		// Reset Probe period
++		mi->probe_period_start = 0;	
++	}
++
++
++	rix1 = rix2 = rix3 = -1;
++
++	// *********************** TX State *********************** //
++	if(mi->state){
++
++#ifdef CUSTOM_DEBUG
++		printk("TX State\n");
++#endif
++	
++		rix1 = mi->max_tp_rate[0]; 	// tx_rate 
++		rix2 = mi->max_tp_rate[1]; 	// down_rate()
++		rix3 = mi->max_tp_rate[2]; 	// down_rate()
++	}	   
++	
++	// *********************** Probe State *********************** //
++	else if(!mi->state){
++
++#ifdef CUSTOM_DEBUG
++		printk("Probe State");
++#endif
++
++		// First Probe: Send at adjacent rates
++		if(!mi->first_probe){
++#ifdef CUSTOM_DEBUG
++			printk("First Probe Period");
++#endif
++			
++			// MCS 
++			mcs_index = mi->max_tp_rate[0] % MCS_GROUP_RATES;
++
++			if(mcs_index > 0 && mcs_index < 7){
++				rix1 = mi->max_tp_rate[0] + 1; 	// up_probe()
++				rix2 = mi->max_tp_rate[0];	// tx_rate
++				rix3 = mi->max_tp_rate[0] - 1; 	// down_probe()
++				try3 = 2;
++			}
++			else if(!mcs_index){
++				rix1 = mi->max_tp_rate[0] + 1;
++				rix2 = mi->max_tp_rate[0];
++				rix3 = mi->max_tp_rate[1];
++			}
++			else {
++				rix1 = mi->max_tp_rate[0];
++				rix2 = mi->max_tp_rate[0] - 1;
++				rix3 = mi->max_tp_rate[0] - 2;
++			}
++
++			mi->first_probe = true;
++			mi->probe_interval = 10; //ms
++		}
++		
++		// Second Probe: Send adjacent groups
++		else {
++
++#ifdef CUSTOM_DEBUG
++			printk("Second Probe Period");
++#endif
++
++			mi->first_probe = false;
++			mi->probe_interval = 60; //ms
++			
++			//Find the group we are, by taking max_tp_rates[0] value
++			tx_rate = mi->max_tp_rate[0];
++
++			//Find the mcs_index in our group
++			mcs_index = mi->max_tp_rate[0] % MCS_GROUP_RATES; 
++
++			// right_probe (+8) and right_down_probe (+7)
++			if (tx_rate >= 0 && tx_rate <= 7){
++				if (mcs_index > 0){
++					rix1 = mi->max_tp_rate[0] + MCS_GROUP_RATES; 		// right_probe()
++					rix2 = mi->max_tp_rate[0] + MCS_GROUP_RATES - 1; 	// right_down_probe()
++					rix3 = mi->max_tp_rate[0];				// tx_rate
++				}
++				else if (!mcs_index){
++					rix1 = mi->max_tp_rate[0] + MCS_GROUP_RATES; 
++					rix2 = mi->max_tp_rate[0] + MCS_GROUP_RATES - 3; 
++					rix3 = mi->max_tp_rate[0];
++				}
++			}
++
++			// left_probe (-8) and left_up_probe (-7)
++		       	else if (tx_rate >= 10 && tx_rate <= 17){
++				if (mcs_index < 7){
++					rix1 = mi->max_tp_rate[0];
++					rix2 = mi->max_tp_rate[0] - (MCS_GROUP_RATES - 1); 	// left_up_probe()
++				        rix3 = mi->max_tp_rate[0] - MCS_GROUP_RATES; 		// left_probe()
++				}
++				else if (mcs_index == 7){
++					rix1 = mi->max_tp_rate[0];
++					rix2 = mi->max_tp_rate[0] - (MCS_GROUP_RATES - 3);
++					rix3 = mi->max_tp_rate[0] - MCS_GROUP_RATES;
++				}
++			}
++		}
++	}
++
++	try1 = try2 = try3 = 2;
++
++
++#ifdef CUSTOM_DEBUG
++	printk("rix1: %d\n", rix1);
++	printk("rix2: %d\n", rix2);
++	printk("rix3: %d\n", rix3);
++#endif
++	
++	if(rix1 < 0 || rix2 < 0 || rix3 < 0){
++		return;
++	}
++	
++	minstrel_ht_update_rates(mp, mi, rix1, rix2, rix3, try1, try2, try3);
++	if(time_after(jiffies, mi->last_stats_update + (mp->update_interval / 2 * HZ) / 1000)){
+ 		minstrel_ht_update_stats(mp, mi);
+ 	}
++				
+ 
+-	if (update)
+-		minstrel_ht_update_rates(mp, mi);
+ }
+ 
+ static inline int
+@@ -875,8 +1126,7 @@
+ 
+ static void
+ minstrel_ht_set_rate(struct minstrel_priv *mp, struct minstrel_ht_sta *mi,
+-                     struct ieee80211_sta_rates *ratetbl, int offset, int index)
+-{
++                    struct ieee80211_sta_rates *ratetbl, int offset, int index, int retries) {
+ 	const struct mcs_group *group = &minstrel_mcs_groups[index / MCS_GROUP_RATES];
+ 	struct minstrel_rate_stats *mrs;
+ 	u8 idx;
+@@ -886,14 +1136,21 @@
+ 	if (!mrs->retry_updated)
+ 		minstrel_calc_retransmit(mp, mi, index);
+ 
+-	if (mrs->prob_ewma < MINSTREL_FRAC(20, 100) || !mrs->retry_count) {
+-		ratetbl->rate[offset].count = 2;
+-		ratetbl->rate[offset].count_rts = 2;
+-		ratetbl->rate[offset].count_cts = 2;
+-	} else {
+-		ratetbl->rate[offset].count = mrs->retry_count;
+-		ratetbl->rate[offset].count_cts = mrs->retry_count;
+-		ratetbl->rate[offset].count_rts = mrs->retry_count_rtscts;
++	if (retries == -1) {
++		if (mrs->prob_ewma < MINSTREL_FRAC(20, 100) || !mrs->retry_count) {
++			ratetbl->rate[offset].count = 2;
++			ratetbl->rate[offset].count_rts = 2;
++			ratetbl->rate[offset].count_cts = 2;
++		} else {
++			ratetbl->rate[offset].count = mrs->retry_count;
++			ratetbl->rate[offset].count_cts = mrs->retry_count;
++			ratetbl->rate[offset].count_rts = mrs->retry_count_rtscts;
++		}
++	}
++	else {
++		ratetbl->rate[offset].count = retries;
++		ratetbl->rate[offset].count_cts = retries;
++		ratetbl->rate[offset].count_rts = retries;
+ 	}
+ 
+ 	if (index / MCS_GROUP_RATES == MINSTREL_CCK_GROUP)
+@@ -977,8 +1234,7 @@
+ }
+ 
+ static void
+-minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi)
+-{
++minstrel_ht_update_rates(struct minstrel_priv *mp, struct minstrel_ht_sta *mi, int rix1, int rix2, int rix3, int try1, int try2, int try3) {
+ 	struct ieee80211_sta_rates *rates;
+ 	int i = 0;
+ 
+@@ -987,15 +1243,15 @@
+ 		return;
+ 
+ 	/* Start with max_tp_rate[0] */
+-	minstrel_ht_set_rate(mp, mi, rates, i++, mi->max_tp_rate[0]);
++	minstrel_ht_set_rate(mp, mi, rates, i++, rix1, try1);
+ 
+ 	if (mp->hw->max_rates >= 3) {
+ 		/* At least 3 tx rates supported, use max_tp_rate[1] next */
+-		minstrel_ht_set_rate(mp, mi, rates, i++, mi->max_tp_rate[1]);
++		minstrel_ht_set_rate(mp, mi, rates, i++, rix2, try2);
+ 	}
+ 
+ 	if (mp->hw->max_rates >= 2) {
+-		minstrel_ht_set_rate(mp, mi, rates, i++, mi->max_prob_rate);
++		minstrel_ht_set_rate(mp, mi, rates, i++, rix3, try3);
+ 	}
+ 
+ 	mi->sta->max_rc_amsdu_len = minstrel_ht_get_max_amsdu_len(mi);
+@@ -1003,6 +1259,37 @@
+ 	rate_control_set_rates(mp->hw, mi->sta, rates);
+ }
+ 
++//Recovery
++void recovery(struct minstrel_priv *mp, struct minstrel_ht_sta *mi){
++	int i = 0;
++	int try1, try2, try3;
++
++	mi->recovery = true;
++	for(i = 0; i < MAX_THR_RATES - 1; i++) {
++		if(!(mi->max_tp_rate[i] % MCS_GROUP_RATES)){ 
++			if(!mi->max_tp_rate[i]){
++				mi->max_tp_rate[i] = 0;
++			}
++			else {
++				mi->max_tp_rate[i] = mi->max_tp_rate[i] - MCS_GROUP_RATES;
++		
++			}
++		}	
++		else {
++			mi->max_tp_rate[i] = mi->max_tp_rate[i] - 1;
++		}
++	}
++
++	// Tries
++	try1 = 2;
++	try2 = 2;
++	try3 = 2;
++	
++	minstrel_ht_update_rates(mp, mi, mi->max_tp_rate[0], mi->max_tp_rate[1], mi->max_tp_rate[2], try1, try2, try3);
++}
++
++
++
+ static int
+ minstrel_get_sample_rate(struct minstrel_priv *mp, struct minstrel_ht_sta *mi)
+ {
+@@ -1175,6 +1462,22 @@
+ 	mi->supported[MINSTREL_CCK_GROUP] = mi->cck_supported;
+ }
+ 
++void short_term_stats_reset(struct minstrel_ht_sta *mi){
++	mi->consecutive_successes	= 0;
++	mi->consecutive_failures 	= 0;
++	mi->consecutive_retries 	= 0;
++}
++
++
++void long_term_stats_init(struct minstrel_ht_sta *mi){
++	mi->state = true;
++	mi->probe_interval 	= 60;	//ms
++	mi->tx_interval 	= 20;	//ms 
++	mi->tx_period_start 	= 0;	//ms
++	mi->probe_period_start 	= 0; 	//ms
++}
++
++
+ static void
+ minstrel_ht_update_caps(void *priv, struct ieee80211_supported_band *sband,
+ 			struct cfg80211_chan_def *chandef,
+@@ -1192,7 +1495,7 @@
+ 	int stbc;
+ 	int i;
+ 	bool ldpc;
+-
++	
+ 	/* fall back to the old minstrel for legacy stations */
+ 	if (!sta->ht_cap.ht_supported)
+ 		goto use_legacy;
+@@ -1319,7 +1622,15 @@
+ 
+ 	/* create an initial rate table with the lowest supported rates */
+ 	minstrel_ht_update_stats(mp, mi);
+-	minstrel_ht_update_rates(mp, mi);
++
++	minstrel_ht_update_rates(mp, mi, mi->max_tp_rate[0], mi->max_tp_rate[1], mi->max_prob_rate, -1, -1, -1);
++ 	
++	
++	// Initialize short term statistics
++	short_term_stats_reset(mi);
++
++	// Initialize long term statistics
++	long_term_stats_init(mi);
+ 
+ 	return;
+ 
+diff -ruN backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.h two_streams/net/mac80211/rc80211_minstrel_ht.h
+--- backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.h	2022-07-04 19:12:08.159751990 +0300
++++ two_streams/net/mac80211/rc80211_minstrel_ht.h	2022-07-04 19:09:27.738932581 +0300
+@@ -29,6 +29,11 @@
+ 
+ #define MCS_GROUP_RATES		10
+ 
++# define NANO_TO_MS(timestamp) (timestamp/1000000)
++
++
++
++
+ struct mcs_group {
+ 	u16 flags;
+ 	u8 streams;
+@@ -73,6 +78,26 @@
+ 
+ 	unsigned int total_packets;
+ 	unsigned int sample_packets;
++	
++	//L3S general information
++	bool state; 	// True: TX State, False: Probe State
++	bool recovery; 	// True: Recovery was Called
++
++	//L3S short term related stats
++	unsigned int consecutive_successes;
++	unsigned int consecutive_failures;
++	unsigned int consecutive_retries;
++
++	//L3S long term related stats
++	bool first_probe;
++	unsigned int probe_interval;
++	unsigned int tx_interval;
++
++
++	unsigned int tx_period_start;
++	unsigned int probe_period_start;
++
++
+ 
+ 	/* tx flags to add for frames for this sta */
+ 	u32 tx_flags;
+Binary files backports-5.3.6-1/net/mac80211/rc80211_minstrel_ht.o and two_streams/net/mac80211/rc80211_minstrel_ht.o differ
+Binary files backports-5.3.6-1/net/mac80211/rc80211_minstrel.o and two_streams/net/mac80211/rc80211_minstrel.o differ
+Binary files backports-5.3.6-1/net/mac80211/rx.o and two_streams/net/mac80211/rx.o differ
+Binary files backports-5.3.6-1/net/mac80211/scan.o and two_streams/net/mac80211/scan.o differ
+Binary files backports-5.3.6-1/net/mac80211/spectmgmt.o and two_streams/net/mac80211/spectmgmt.o differ
+Binary files backports-5.3.6-1/net/mac80211/sta_info.o and two_streams/net/mac80211/sta_info.o differ
+Binary files backports-5.3.6-1/net/mac80211/status.o and two_streams/net/mac80211/status.o differ
+Binary files backports-5.3.6-1/net/mac80211/tdls.o and two_streams/net/mac80211/tdls.o differ
+Binary files backports-5.3.6-1/net/mac80211/tkip.o and two_streams/net/mac80211/tkip.o differ
+Binary files backports-5.3.6-1/net/mac80211/trace.o and two_streams/net/mac80211/trace.o differ
+diff -ruN backports-5.3.6-1/net/mac80211/.trace.o.cmd two_streams/net/mac80211/.trace.o.cmd
+--- backports-5.3.6-1/net/mac80211/.trace.o.cmd	2022-07-04 18:51:08.164639955 +0300
++++ two_streams/net/mac80211/.trace.o.cmd	2022-07-04 18:21:24.177910773 +0300
+@@ -1555,6 +1555,7 @@
+   include/trace/perf.h \
+   include/trace/bpf_probe.h \
+   /root/backports-5.3.6-1/net/mac80211/trace_msg.h \
++  /root/backports-5.3.6-1/net/mac80211/./trace_msg.h \
+ 
+ /root/backports-5.3.6-1/net/mac80211/trace.o: $(deps_/root/backports-5.3.6-1/net/mac80211/trace.o)
+ 
+Binary files backports-5.3.6-1/net/mac80211/tx.o and two_streams/net/mac80211/tx.o differ
+Binary files backports-5.3.6-1/net/mac80211/util.o and two_streams/net/mac80211/util.o differ
+Binary files backports-5.3.6-1/net/mac80211/vht.o and two_streams/net/mac80211/vht.o differ
+Binary files backports-5.3.6-1/net/mac80211/wep.o and two_streams/net/mac80211/wep.o differ
+Binary files backports-5.3.6-1/net/mac80211/wme.o and two_streams/net/mac80211/wme.o differ
+Binary files backports-5.3.6-1/net/mac80211/wpa.o and two_streams/net/mac80211/wpa.o differ
+Binary files backports-5.3.6-1/net/wireless/cfg80211.ko and two_streams/net/wireless/cfg80211.ko differ
+diff -ruN backports-5.3.6-1/net/wireless/cfg80211.mod two_streams/net/wireless/cfg80211.mod
+--- backports-5.3.6-1/net/wireless/cfg80211.mod	2022-07-04 18:51:51.919778586 +0300
++++ two_streams/net/wireless/cfg80211.mod	2022-07-04 18:21:26.969885020 +0300
+@@ -1,2 +1,2 @@
+-/root/backports-5.3.6-1/net/wireless/core.o /root/backports-5.3.6-1/net/wireless/sysfs.o /root/backports-5.3.6-1/net/wireless/radiotap.o /root/backports-5.3.6-1/net/wireless/util.o /root/backports-5.3.6-1/net/wireless/reg.o /root/backports-5.3.6-1/net/wireless/scan.o /root/backports-5.3.6-1/net/wireless/nl80211.o /root/backports-5.3.6-1/net/wireless/mlme.o /root/backports-5.3.6-1/net/wireless/ibss.o /root/backports-5.3.6-1/net/wireless/sme.o /root/backports-5.3.6-1/net/wireless/chan.o /root/backports-5.3.6-1/net/wireless/ethtool.o /root/backports-5.3.6-1/net/wireless/mesh.o /root/backports-5.3.6-1/net/wireless/ap.o /root/backports-5.3.6-1/net/wireless/trace.o /root/backports-5.3.6-1/net/wireless/ocb.o /root/backports-5.3.6-1/net/wireless/pmsr.o /root/backports-5.3.6-1/net/wireless/wext-compat.o /root/backports-5.3.6-1/net/wireless/wext-sme.o /root/backports-5.3.6-1/net/wireless/shipped-certs.o
++/root/backports-5.3.6-1/net/wireless/core.o /root/backports-5.3.6-1/net/wireless/sysfs.o /root/backports-5.3.6-1/net/wireless/radiotap.o /root/backports-5.3.6-1/net/wireless/util.o /root/backports-5.3.6-1/net/wireless/reg.o /root/backports-5.3.6-1/net/wireless/scan.o /root/backports-5.3.6-1/net/wireless/nl80211.o /root/backports-5.3.6-1/net/wireless/mlme.o /root/backports-5.3.6-1/net/wireless/ibss.o /root/backports-5.3.6-1/net/wireless/sme.o /root/backports-5.3.6-1/net/wireless/chan.o /root/backports-5.3.6-1/net/wireless/ethtool.o /root/backports-5.3.6-1/net/wireless/mesh.o /root/backports-5.3.6-1/net/wireless/ap.o /root/backports-5.3.6-1/net/wireless/trace.o /root/backports-5.3.6-1/net/wireless/ocb.o /root/backports-5.3.6-1/net/wireless/pmsr.o /root/backports-5.3.6-1/net/wireless/debugfs.o /root/backports-5.3.6-1/net/wireless/wext-compat.o /root/backports-5.3.6-1/net/wireless/wext-sme.o /root/backports-5.3.6-1/net/wireless/shipped-certs.o
+ 
+diff -ruN backports-5.3.6-1/net/wireless/cfg80211.mod.c two_streams/net/wireless/cfg80211.mod.c
+--- backports-5.3.6-1/net/wireless/cfg80211.mod.c	2022-07-04 18:39:53.937958002 +0300
++++ two_streams/net/wireless/cfg80211.mod.c	2022-07-04 18:21:26.997884761 +0300
+@@ -28,4 +28,4 @@
+ "depends=compat";
+ 
+ 
+-MODULE_INFO(srcversion, "894734E4C5DD8692FA028F4");
++MODULE_INFO(srcversion, "E85A265DC2523F51E826D33");
+diff -ruN backports-5.3.6-1/net/wireless/.cfg80211.mod.cmd two_streams/net/wireless/.cfg80211.mod.cmd
+--- backports-5.3.6-1/net/wireless/.cfg80211.mod.cmd	2022-07-04 18:51:51.919778586 +0300
++++ two_streams/net/wireless/.cfg80211.mod.cmd	2022-07-04 18:21:26.977884946 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/net/wireless/cfg80211.mod := { echo  /root/backports-5.3.6-1/net/wireless/core.o /root/backports-5.3.6-1/net/wireless/sysfs.o /root/backports-5.3.6-1/net/wireless/radiotap.o /root/backports-5.3.6-1/net/wireless/util.o /root/backports-5.3.6-1/net/wireless/reg.o /root/backports-5.3.6-1/net/wireless/scan.o /root/backports-5.3.6-1/net/wireless/nl80211.o /root/backports-5.3.6-1/net/wireless/mlme.o /root/backports-5.3.6-1/net/wireless/ibss.o /root/backports-5.3.6-1/net/wireless/sme.o /root/backports-5.3.6-1/net/wireless/chan.o /root/backports-5.3.6-1/net/wireless/ethtool.o /root/backports-5.3.6-1/net/wireless/mesh.o /root/backports-5.3.6-1/net/wireless/ap.o /root/backports-5.3.6-1/net/wireless/trace.o /root/backports-5.3.6-1/net/wireless/ocb.o /root/backports-5.3.6-1/net/wireless/pmsr.o /root/backports-5.3.6-1/net/wireless/wext-compat.o /root/backports-5.3.6-1/net/wireless/wext-sme.o /root/backports-5.3.6-1/net/wireless/shipped-certs.o; echo; } > /root/backports-5.3.6-1/net/wireless/cfg80211.mod
++cmd_/root/backports-5.3.6-1/net/wireless/cfg80211.mod := { echo  /root/backports-5.3.6-1/net/wireless/core.o /root/backports-5.3.6-1/net/wireless/sysfs.o /root/backports-5.3.6-1/net/wireless/radiotap.o /root/backports-5.3.6-1/net/wireless/util.o /root/backports-5.3.6-1/net/wireless/reg.o /root/backports-5.3.6-1/net/wireless/scan.o /root/backports-5.3.6-1/net/wireless/nl80211.o /root/backports-5.3.6-1/net/wireless/mlme.o /root/backports-5.3.6-1/net/wireless/ibss.o /root/backports-5.3.6-1/net/wireless/sme.o /root/backports-5.3.6-1/net/wireless/chan.o /root/backports-5.3.6-1/net/wireless/ethtool.o /root/backports-5.3.6-1/net/wireless/mesh.o /root/backports-5.3.6-1/net/wireless/ap.o /root/backports-5.3.6-1/net/wireless/trace.o /root/backports-5.3.6-1/net/wireless/ocb.o /root/backports-5.3.6-1/net/wireless/pmsr.o /root/backports-5.3.6-1/net/wireless/debugfs.o /root/backports-5.3.6-1/net/wireless/wext-compat.o /root/backports-5.3.6-1/net/wireless/wext-sme.o /root/backports-5.3.6-1/net/wireless/shipped-certs.o; echo; } > /root/backports-5.3.6-1/net/wireless/cfg80211.mod
+Binary files backports-5.3.6-1/net/wireless/cfg80211.mod.o and two_streams/net/wireless/cfg80211.mod.o differ
+Binary files backports-5.3.6-1/net/wireless/cfg80211.o and two_streams/net/wireless/cfg80211.o differ
+diff -ruN backports-5.3.6-1/net/wireless/.cfg80211.o.cmd two_streams/net/wireless/.cfg80211.o.cmd
+--- backports-5.3.6-1/net/wireless/.cfg80211.o.cmd	2022-07-04 18:51:51.895779059 +0300
++++ two_streams/net/wireless/.cfg80211.o.cmd	2022-07-04 18:21:26.957885130 +0300
+@@ -1 +1 @@
+-cmd_/root/backports-5.3.6-1/net/wireless/cfg80211.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/net/wireless/cfg80211.o /root/backports-5.3.6-1/net/wireless/core.o /root/backports-5.3.6-1/net/wireless/sysfs.o /root/backports-5.3.6-1/net/wireless/radiotap.o /root/backports-5.3.6-1/net/wireless/util.o /root/backports-5.3.6-1/net/wireless/reg.o /root/backports-5.3.6-1/net/wireless/scan.o /root/backports-5.3.6-1/net/wireless/nl80211.o /root/backports-5.3.6-1/net/wireless/mlme.o /root/backports-5.3.6-1/net/wireless/ibss.o /root/backports-5.3.6-1/net/wireless/sme.o /root/backports-5.3.6-1/net/wireless/chan.o /root/backports-5.3.6-1/net/wireless/ethtool.o /root/backports-5.3.6-1/net/wireless/mesh.o /root/backports-5.3.6-1/net/wireless/ap.o /root/backports-5.3.6-1/net/wireless/trace.o /root/backports-5.3.6-1/net/wireless/ocb.o /root/backports-5.3.6-1/net/wireless/pmsr.o /root/backports-5.3.6-1/net/wireless/wext-compat.o /root/backports-5.3.6-1/net/wireless/wext-sme.o /root/backports-5.3.6-1/net/wireless/shipped-certs.o
++cmd_/root/backports-5.3.6-1/net/wireless/cfg80211.o := ld -m elf_x86_64  -z max-page-size=0x200000    -r -o /root/backports-5.3.6-1/net/wireless/cfg80211.o /root/backports-5.3.6-1/net/wireless/core.o /root/backports-5.3.6-1/net/wireless/sysfs.o /root/backports-5.3.6-1/net/wireless/radiotap.o /root/backports-5.3.6-1/net/wireless/util.o /root/backports-5.3.6-1/net/wireless/reg.o /root/backports-5.3.6-1/net/wireless/scan.o /root/backports-5.3.6-1/net/wireless/nl80211.o /root/backports-5.3.6-1/net/wireless/mlme.o /root/backports-5.3.6-1/net/wireless/ibss.o /root/backports-5.3.6-1/net/wireless/sme.o /root/backports-5.3.6-1/net/wireless/chan.o /root/backports-5.3.6-1/net/wireless/ethtool.o /root/backports-5.3.6-1/net/wireless/mesh.o /root/backports-5.3.6-1/net/wireless/ap.o /root/backports-5.3.6-1/net/wireless/trace.o /root/backports-5.3.6-1/net/wireless/ocb.o /root/backports-5.3.6-1/net/wireless/pmsr.o /root/backports-5.3.6-1/net/wireless/debugfs.o /root/backports-5.3.6-1/net/wireless/wext-compat.o /root/backports-5.3.6-1/net/wireless/wext-sme.o /root/backports-5.3.6-1/net/wireless/shipped-certs.o
+Binary files backports-5.3.6-1/net/wireless/core.o and two_streams/net/wireless/core.o differ

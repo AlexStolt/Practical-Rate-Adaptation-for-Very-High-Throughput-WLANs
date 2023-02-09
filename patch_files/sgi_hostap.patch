@@ -1,0 +1,29 @@
+*** hostap.conf	2022-07-04 19:37:43.983402765 +0300
+--- orig.conf	2022-07-04 19:35:06.966716778 +0300
+***************
+*** 578,584 ****
+  # 1 = enabled
+  # Note: You will also need to enable WMM for full HT functionality.
+  # Note: hw_mode=g (2.4 GHz) and hw_mode=a (5 GHz) is used to specify the band.
+! ieee80211n=1
+  
+  # ht_capab: HT capabilities (list of flags)
+  # LDPC coding capability: [LDPC] = supported
+--- 578,584 ----
+  # 1 = enabled
+  # Note: You will also need to enable WMM for full HT functionality.
+  # Note: hw_mode=g (2.4 GHz) and hw_mode=a (5 GHz) is used to specify the band.
+! #ieee80211n=1
+  
+  # ht_capab: HT capabilities (list of flags)
+  # LDPC coding capability: [LDPC] = supported
+***************
+*** 612,618 ****
+  # 40 MHz intolerant [40-INTOLERANT] (not advertised if not set)
+  # L-SIG TXOP protection support: [LSIG-TXOP-PROT] (disabled if not set)
+  #ht_capab=[HT40-][SHORT-GI-20][SHORT-GI-40]
+- ht_capab = [SHORT-GI-20]
+  
+  # Require stations to support HT PHY (reject association if they do not)
+  #require_ht=1
+--- 612,617 ----
