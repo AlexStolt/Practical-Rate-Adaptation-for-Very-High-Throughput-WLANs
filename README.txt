@@ -1,8 +1,6 @@
-Practical Rate Adaptation for
-Very High Throughput WLANs
+# Practical Rate Adaptation for Very High Throughput WLANs
 
-*********** [Submission Files] ***********
-
+## Submission Files
 1. patch_files
 * [two_streams.patch]:       Patch files for the suggested L3S algorithm implementation with two streams
 * [three_streams.patch]:     Patch files for our first implemented extention for three streams
